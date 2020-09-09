@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    password: Zjh990713_mysql
+    url: jdbc:mysql://localhost:3306/fitness?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
