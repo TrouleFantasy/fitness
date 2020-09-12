@@ -2,7 +2,7 @@ package com.seeker.fitness.all.entity;
 
 import java.util.Objects;
 
-public class FoodType {
+public class FoodType extends BaseEntity{
     private Integer ftid ;//id
     private Integer type;//种类代码
     private String chType;//种类名称
@@ -34,7 +34,7 @@ public class FoodType {
                 ", chType='" + chType + '\'' +
                 ", upType=" + upType +
                 ", typeDescribe='" + typeDescribe + '\'' +
-                '}';
+                "} " + super.toString();
     }
 
     public Integer getFtid() {

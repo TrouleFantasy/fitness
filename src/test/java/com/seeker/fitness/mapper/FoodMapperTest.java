@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
@@ -29,7 +30,7 @@ public class FoodMapperTest {
 
     @Test
     void getFoodBynameTest(){
-        List<Food> list=foodMapper.getFoodByName("鸡");
+        List<Food> list=foodMapper.getFoodsByName("鸡");
         for(Food food:list){
             System.out.println(food.toString());
         }
@@ -38,7 +39,7 @@ public class FoodMapperTest {
     @Test
     void addFood(){
         Food food=new Food();
-        food.appoint("鸡胸肉",0.025,0.194,0.05,null,null,1);
+        food.appoint("鸡胸肉0",0.025,0.194,0.05,null,null,1,0,0,new Date(),new Date());
         foodMapper.addFood(food);
     }
 

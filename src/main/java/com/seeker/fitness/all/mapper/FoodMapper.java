@@ -2,10 +2,7 @@ package com.seeker.fitness.all.mapper;
 
 import com.seeker.fitness.all.entity.Food;
 import com.seeker.fitness.all.entity.FoodType;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -15,6 +12,12 @@ public interface FoodMapper {
      * @return 返回食物结果集
      */
     @Select("SELECT * FROM food_table")
+    @Results(id = "fourLog", value = {
+            @Result(property = "addUser",column = "add_user"),
+            @Result(property = "modifyUser",column = "modify_user"),
+            @Result(property = "addDate",column = "add_date"),
+            @Result(property = "modifyDate",column = "modify_date")
+    })
     List<Food> getAll();
 
     /**
@@ -23,14 +26,19 @@ public interface FoodMapper {
      * @return
      */
     @Select("SELECT * FROM food_table WHERE type=${type}")
+    @ResultMap("fourLog")
     List<Food> getFoodsByType(Integer type);
     /**
-     * 根据名称查询食物
+     * 根据名称模糊查询食物
      * @param name
      * @return
      */
+    //两种写法
     @Select("SELECT * FROM food_table WHERE name like '%${name}%'")
+//    @Select("SELECT * FROM food_table WHERE name LIKE CONCAT('%',#{name},'%')")
+    @ResultMap("fourLog")
     List<Food> getFoodsByName(String name);
+
 
     /**
      * 根据type返回foodType对象
@@ -75,21 +83,16 @@ public interface FoodMapper {
      * @return
      */
     @Select("SELECT * FROM food_table WHERE fid=#{fid}")
+    @ResultMap("fourLog")
     Food getFood(Integer fid);
 
-    /**
-     * 根据指定食物名返回 对应模糊查询的食物
-     * @param name
-     * @return
-     */
-    @Select("SELECT * FROM food_table WHERE name LIKE CONCAT('%',#{name},'%')")
-    List<Food> getFoodByName(String name);
+
 
     /**
      * 新增一种食物
      * @param food
      */
-    @Insert("INSERT INTO food_table(name,carbohydrate,protein,fat,fiber,sodium,kcal,kj,type) VALUES(#{name},#{carbohydrate},#{protein},#{fat},#{fiber},#{sodium},#{kcal},#{kj},#{type})")
+    @Insert("INSERT INTO food_table(name,carbohydrate,protein,fat,fiber,sodium,kcal,kj,type,add_user,modify_user,add_date,modify_date) VALUES(#{name},#{carbohydrate},#{protein},#{fat},#{fiber},#{sodium},#{kcal},#{kj},#{type},#{addUser},#{modifyUser},#{addDate},#{modifyDate})")
     Integer addFood(Food food);
 
 }

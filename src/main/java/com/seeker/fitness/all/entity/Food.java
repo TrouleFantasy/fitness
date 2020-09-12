@@ -1,11 +1,12 @@
 package com.seeker.fitness.all.entity;
 
+import java.util.Date;
 import java.util.Objects;
 
 /**
  * food_table表的实体类 该表并没有weight字段 因为业务所需所以在实体类中增加该属性
  */
-public class Food {
+public class Food extends BaseEntity{
     private static final String FORMAT="%.4f";
     private Integer fid;
     private String name;//食物名
@@ -20,6 +21,10 @@ public class Food {
     private String chType;//种类中文名
     private Double weight;//重量 单位:克
 
+    /**
+     * 判断是否是有效食物
+     * @return
+     */
     public boolean isMust(){
         return  (getName()!=null&&!"".equals(getName())&&!"null".equals(getName()))
                 &&getCarbohydrate()!=null
@@ -84,6 +89,12 @@ public class Food {
             this.kj= attrbuteFormat(this.kj);
         }
     }
+
+    /**
+     * 保留指定位数
+     * @param d
+     * @return
+     */
     private Double attrbuteFormat(Double d){
         if(d!=null){
             return Double.parseDouble(String.format(FORMAT,d));
@@ -92,6 +103,16 @@ public class Food {
         }
     }
 
+    /**
+     * 设定食物初始属性(主要在添加食物时使用,本质就是设置该食物各种营养成分每1克的含量)
+     * @param name
+     * @param carbohydrate
+     * @param protein
+     * @param fat
+     * @param fiber
+     * @param sodium
+     * @param type
+     */
     public void appoint(String name,Double carbohydrate,Double protein,Double fat,Double fiber,Double sodium,Integer type){
         setName(name);
         setCarbohydrate(carbohydrate);
@@ -104,6 +125,42 @@ public class Food {
         setType(type);
         attrbuteFormat();
     }
+
+    /**
+     * 设定食物初始属性(主要在添加食物时使用,本质就是设置该食物各种营养成分每1克的含量)并且设置四项日志
+     * @param name
+     * @param carbohydrate
+     * @param protein
+     * @param fat
+     * @param fiber
+     * @param sodium
+     * @param type
+     * @param addUser
+     * @param modifyUser
+     * @param addDate
+     * @param modifyDate
+     */
+    public void appoint(String name, Double carbohydrate, Double protein, Double fat, Double fiber, Double sodium, Integer type, Integer addUser, Integer modifyUser, Date addDate, Date modifyDate){
+        setName(name);
+        setCarbohydrate(carbohydrate);
+        setProtein(protein);
+        setFat(fat);
+        setFiber(fiber);
+        setSodium(sodium);
+        setKcal(carbohydrate+protein*4+fat*9);
+        setKj(getKcal()*4.1);
+        setType(type);
+        super.setAddUser(addUser);
+        super.setAddDate(addDate);
+        super.setModifyUser(modifyUser);
+        super.setModifyDate(modifyDate);
+        attrbuteFormat();
+    }
+
+    /**
+     * 食物设定指定克数
+     * @param g
+     */
     public void foodSet(Number g){
         this.weight=g.doubleValue();
         this.carbohydrate=this.weight*carbohydrate;
@@ -116,14 +173,29 @@ public class Food {
         attrbuteFormat();
     }
 
-    public void foodAddition(){//食物加1克
+    /**
+     * 食物加1克
+     */
+    public void foodAddition(){
         this.weight+=1;
         foodSet(this.weight);
     }
-    public void foodAddition(Integer w){//食物加指定克
+
+    /**
+     * 食物加指定克
+     * @param w
+     */
+    public void foodAddition(Integer w){
+        if(this.weight==null){
+            this.weight=0.00;
+        }
         this.weight+=w;
         foodSet(this.weight);
     }
+
+    /**
+     * 输出食物信息
+     */
     protected void foodInfos(){
         System.out.println("食物编号:"+getFid());
         System.out.println("食物名:"+getName());
@@ -136,6 +208,7 @@ public class Food {
         System.out.println("食物总热量:"+getKj()+"kj");
         System.out.println("食物类型:"+getType());
         System.out.println("重量:"+getWeight()+"g");
+        super.info();
         System.out.println("---------------------------------");
     }
 
@@ -167,16 +240,17 @@ public class Food {
         return "Food{" +
                 "fid=" + fid +
                 ", name='" + name + '\'' +
-                ", protein=" + protein +
                 ", carbohydrate=" + carbohydrate +
+                ", protein=" + protein +
                 ", fat=" + fat +
                 ", fiber=" + fiber +
                 ", sodium=" + sodium +
-                ", weight=" + weight +
                 ", kcal=" + kcal +
                 ", kj=" + kj +
                 ", type=" + type +
-                '}';
+                ", chType='" + chType + '\'' +
+                ", weight=" + weight +
+                "} " + super.toString();
     }
 
     public void setWeight(Double weight) {
@@ -274,4 +348,5 @@ public class Food {
     public void setChType(String chType) {
         this.chType = chType;
     }
+
 }
