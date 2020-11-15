@@ -1,6 +1,7 @@
 package com.seeker.fitness.all.util.excel;
 
 import com.seeker.fitness.all.entity.Food;
+import com.seeker.fitness.all.util.ReadConfigFileUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,6 +18,17 @@ import java.util.*;
  * 提供excel的读写功能
  */
 public class FoodExcelUtil {
+    private static String[] head;
+    private static String sheetName;
+    //写在静态初始化块中，使得其被加载时都会读取配置文件
+    static {
+        System.out.println("调用了初始化块");
+        //读取配置文件获取模版信息
+        Map<String,Object> yamlMap=ReadConfigFileUtil.getYaml("ExcelHeadModel.yml");
+        sheetName=String.valueOf(yamlMap.get("foodImportTemplate_sheet"));
+        String headStr=String.valueOf(yamlMap.get("foodImportTemplate_head"));
+        head = headStr.split(",");
+    }
 
     /**
      * 读取Excel文件 返回其中Food
@@ -59,12 +71,15 @@ public class FoodExcelUtil {
      * 写出上传模版
      * @param outputStream
      */
-    public static void writeMode(String[] strs,OutputStream outputStream) {
+    public static void writeMode(Map<String,String[]> map, OutputStream outputStream) {
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
-        XSSFSheet xssfSheet = xssfWorkbook.createSheet("上传模版");
+        //设置sheet页名称
+        XSSFSheet xssfSheet = xssfWorkbook.createSheet(sheetName);
+        //设置头部信息
         setHead(xssfSheet);
         //设置类型的下拉选
-        setXSSFValidation(xssfSheet,strs,1,100,9,9);
+        String[] foodTypes=map.get("foodTypes");
+        setXSSFValidation(xssfSheet,foodTypes,1,100,9,9);
         try {
             xssfWorkbook.write(outputStream);
         } catch (IOException e) {
@@ -169,7 +184,7 @@ public class FoodExcelUtil {
     }
 
     /**
-     * 改方法封装了 在一行中依次往后添加元素
+     * 该方法封装了 在一行中依次往后添加元素
      * @param food
      * @param sheet
      * @param doubles
@@ -282,7 +297,7 @@ public class FoodExcelUtil {
      * @param  endRow    添加下拉框对应结束行
      * @param  firstCol  添加下拉框对应开始列
      * @param  endCol    添加下拉框对应结束列
-     * @return HSSFSheet 设置好的sheet.
+     * @return XSSFSheet 设置好的sheet.
      */
     private static XSSFSheet setXSSFValidation(XSSFSheet sheet, String[] textlist, int firstRow, int endRow, int firstCol, int endCol){
         // 设置数据有效性加载在哪个单元格上,四个参数分别是：起始行、终止行、起始列、终止列
@@ -299,9 +314,13 @@ public class FoodExcelUtil {
         sheet.addValidationData(validation);
         return sheet;
     }
-    //设置头部
+
+    /**
+     * 设置头部方法
+     * @param sheet
+     * @return
+     */
     private static int setHead(XSSFSheet sheet) {
-        String[] head = {"食物名", "碳水", "蛋白质", "脂肪", "膳食纤维", "钠", "热量", "千焦", "克数", "种类"};
         Integer oldNum = sheet.getPhysicalNumberOfRows();//已有行数
         //下面这个语句的意思为 创建一个row 该row表示该工作表中第一行 也就是设置该表的列名
         XSSFRow headRow = sheet.createRow(oldNum == 0 ? 0 : sheet.getLastRowNum() + 1);//设置头部标题
@@ -311,6 +330,11 @@ public class FoodExcelUtil {
         return head.length;
     }
 
+    /**
+     * 将Cell数据转换为double类型
+     * @param cell
+     * @return
+     */
     public static Double getCellToDoule(Cell cell){
         String str=getCellToString(cell);
         if("".equals(str)){
