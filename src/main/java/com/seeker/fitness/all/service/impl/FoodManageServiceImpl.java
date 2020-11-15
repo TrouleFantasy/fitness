@@ -22,7 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 本类实现了关于食物后台管理业务层接口(FoodManageService)的所有方法
@@ -42,7 +44,6 @@ public class FoodManageServiceImpl implements FoodManageService {
         Food foodObj = new Food();
         foodObj.appoint(food.getName(), food.getCarbohydrate(), food.getProtein(), food.getFat(), food.getFiber(), food.getSodium(), food.getType());
         try {
-
             foodMapper.addFood(foodObj);
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,6 +73,7 @@ public class FoodManageServiceImpl implements FoodManageService {
             }
             StringBuffer sb=new StringBuffer();
             List<Food> list= FoodExcelUtil.readerToList(workbook);
+            //开始循环写入
             for(int i=0;i<list.size();i++){
                 Food food=list.get(i);
                 String foodName=food.getName();
@@ -118,15 +120,20 @@ public class FoodManageServiceImpl implements FoodManageService {
      * @param response
      */
     public void downLoadModeService(HttpServletResponse response) {
+        String interfaceName="下载上传模版";
+        System.out.println(interfaceName+"接口开始调用");
         try {
             response.setContentType("application/force-download");
-            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("模版.xlsx", "ISO-8859-1"));
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("食物导入模版.xlsx", "UTF-8"));
             List<FoodType> l=foodMapper.getFoodType();
-            String[] strs=new String[l.size()];
+            String[] foodTypes=new String[l.size()];
             for(int i=0;i<l.size();i++){
-                strs[i]=l.get(i).getChType();
+                foodTypes[i]=l.get(i).getChType();
             }
-            FoodExcelUtil.writeMode(strs,response.getOutputStream());
+            Map<String,String[]> map=new HashMap<>();
+            map.put("foodTypes",foodTypes);
+            FoodExcelUtil.writeMode(map,response.getOutputStream());
+            System.out.println(interfaceName+"调用结束");
         } catch (IOException e) {
             e.printStackTrace();
             throw new WithIOException("获取IO流异常！下载模版失败！");
