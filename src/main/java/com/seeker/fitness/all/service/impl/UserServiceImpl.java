@@ -92,33 +92,40 @@ public class UserServiceImpl implements UserService {
         if(StringUtils.isEmpty(password)){
             return ResponseResult.errorResponse("password不得为空！");
         }
+        try {
+            //判断密码正确性
+            //根据账号查找对应用户信息
+            User resultUser=userMapper.getUserByUserCode(userCode);
+            if(resultUser==null||resultUser.getValid()!=1){
+                return ResponseResult.errorResponse("无效用户！");
+            }
+            //获取数据库中储存的用户密码
+            String resultPassword=resultUser.getPassword();
+            //将入参中的密码加密后与数据库中储存的密码对比
+            String md5Password=DigestUtils.md5DigestAsHex(password.getBytes());
+            //如果不一致则返回错误
+            if(!resultPassword.equals(md5Password)){
+                return ResponseResult.errorResponse("密码不正确！");
+            }
 
-        //判断密码正确性
-        //根据账号查找对应用户信息
-        User resultUser=userMapper.getUserByUserCode(userCode);
-        //获取数据库中储存的用户密码
-        String resultPassword=resultUser.getPassword();
-        //将入参中的密码加密后与数据库中储存的密码对比
-        String md5Password=DigestUtils.md5DigestAsHex(password.getBytes());
-        //如果不一致则返回错误
-        if(!resultPassword.equals(md5Password)){
-            return ResponseResult.errorResponse("密码不正确！");
+            //如果一致则准许登录 返回用户信息并发放token
+            //生成token
+            String token=PracticalUtil.createToken(userCode);
+            //将token放置在响应头中
+            response.setHeader("token",token);
+            //写入redis
+            //获取一个redis连接
+            Jedis jedis=RedisFactory.getJedis();
+            //设置一个键值对 并设置超时时间 此时间就是token的过期时间
+            jedis.set(token,userCode);
+            jedis.expireAt(token,PracticalUtil.getTimeStamp(tokenTimeOut));
+            //释放连接
+            jedis.close();
+            return ResponseResult.successResponse(resultUser.toResponseUser());
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseResult.errorResponse("解析报文时出现异常！");
         }
 
-        //如果一致则准许登录 返回用户信息并发放token
-        //生成token
-        String token=PracticalUtil.getToken(userCode);
-        //将token放置在响应头中
-        response.setHeader("token",token);
-        System.out.println(token);
-        //写入redis
-        //获取一个redis连接
-        Jedis jedis=RedisFactory.getJedis();
-        //设置一个键值对 并设置超时时间 此时间就是token的过期时间
-        jedis.set(token,userCode);
-        jedis.expireAt(token,PracticalUtil.getTimeStamp(tokenTimeOut));
-        //释放连接
-        jedis.close();
-        return ResponseResult.successResponse(resultUser.toResponseUser());
     }
 }

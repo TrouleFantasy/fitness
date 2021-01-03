@@ -1,7 +1,7 @@
 package com.seeker.fitness.all.interceptor;
 
-import com.seeker.fitness.all.util.PracticalUtil;
 import com.seeker.fitness.all.util.ResponseResult;
+import com.seeker.fitness.all.util.redis.RedisUtil;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -18,9 +18,9 @@ public class UserInterceptor implements HandlerInterceptor {
         //获取用户携带的token
         String token=request.getHeader("token");
         //判断其token是否正确且有效
-        if(!StringUtils.isEmpty(token)&&PracticalUtil.isTokenValid(token)){
+        if(!StringUtils.isEmpty(token)&&RedisUtil.isTokenValid(token)){
             //有效则继续其请求并且为当前token续期
-            PracticalUtil.tokenRenewal(token);
+            RedisUtil.tokenRenewal(token);
             return true;
         }
         //否则进行阻拦操作

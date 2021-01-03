@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.entity.User;
 import com.seeker.fitness.all.service.UserService;
 import com.seeker.fitness.all.util.ResponseResult;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

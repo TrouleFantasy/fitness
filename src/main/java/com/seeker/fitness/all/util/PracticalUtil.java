@@ -1,34 +1,16 @@
 package com.seeker.fitness.all.util;
 
-import com.alibaba.fastjson.JSONObject;
-import com.seeker.fitness.all.util.redis.RedisFactory;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
-import redis.clients.jedis.Jedis;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 
 /**
  * 按照规律生成打印日志的标示，辅助查找日志
  */
 public class PracticalUtil {
-    private  static String yamlMapString;
-    private  static JSONObject yamlMap;
-    private  static Long tokenTimeOut;
-    static {
-        Map<String,Object> yaml=ReadConfigFileUtil.getYaml();
-        yamlMapString=JSONObject.toJSONString(yaml);
-        yamlMap=JSONObject.parseObject(yamlMapString);
-        tokenTimeOut=yamlMap.getJSONObject("user").getLong("tokenTimeOut");
-    }
-
-    public static JSONObject getYamlMap() {
-        return JSONObject.parseObject(yamlMapString);
-    }
 
     /**
      * 根据时间生成时间标志
@@ -128,7 +110,7 @@ public class PracticalUtil {
      * 统一生成token的方法
      * @return
      */
-    public static String getToken(String salt){
+    public static String createToken(String salt){
         String uid=UUID.nameUUIDFromBytes(salt.getBytes()).toString().replace("-","");
         String dateStr=new Date().toString();
         String allStr="fitness"+uid+salt+dateStr;
@@ -137,36 +119,6 @@ public class PracticalUtil {
             token=DigestUtils.md5DigestAsHex(token.getBytes());
         }
         return token;
-    }
-
-    //-------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * 判断给定token是否有效
-     * @param token
-     * @return
-     */
-    public static boolean isTokenValid(String token){
-        if(StringUtils.isEmpty(token)){
-            return false;
-        }
-        Jedis jedis= RedisFactory.getJedis();
-        String result=jedis.get(token);
-        if(!StringUtils.isEmpty(result)&&!"null".equals(result)){
-            return true;
-        }
-        return false;
-    }
-
-    //-------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * 为给定token续期
-     * @param token
-     */
-    public static void tokenRenewal(String token){
-        Jedis jedis= RedisFactory.getJedis();
-        jedis.expireAt(token,getTimeStamp(tokenTimeOut));
     }
 
     //-------------------------------------------------------------------------------------------------------------------

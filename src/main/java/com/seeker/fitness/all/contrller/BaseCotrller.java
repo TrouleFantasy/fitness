@@ -1,8 +1,9 @@
-package com.seeker.fitness.all.util;
+package com.seeker.fitness.all.contrller;
 
 import com.seeker.fitness.all.ex.AddFoodException;
 import com.seeker.fitness.all.ex.InputAnomalyException;
 import com.seeker.fitness.all.ex.ServiceException;
+import com.seeker.fitness.all.util.ResponseResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

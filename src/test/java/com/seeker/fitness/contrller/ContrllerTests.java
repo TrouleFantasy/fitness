@@ -2,7 +2,7 @@ package com.seeker.fitness.contrller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.entity.User;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,12 +18,21 @@ public class ContrllerTests {
 
     @Test
     public void aaa(){
-        RestTemplate restTemplate=new RestTemplate();
-        HttpHeaders headers=new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> httpEntity=new HttpEntity<>(headers);
-        String result=restTemplate.postForObject("http://127.0.0.1:8081/users/aaa",httpEntity,String.class);
-        System.out.println(result);
+        User user=new User();
+            user.setUserName("弱鸡2");//昵称
+            user.setUserCode("niceMy201503");//账号
+            user.setPassword("qwer1234");//密码
+            user.setSex(1);//性别
+        Date date= null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse("1999-07-13");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        user.setBirthDate(date);//出生日期
+            user.setPhoneNumber("15233571929");//手机号
+            user.setRegion("北京");//地区
+     System.out.println(JSONObject.toJSONString(user));
     }
     @Test
     public void enrollUserTest(){

@@ -3,7 +3,7 @@ package com.seeker.fitness.mapper;
 import com.seeker.fitness.all.entity.User;
 import com.seeker.fitness.all.mapper.UserMapper;
 import com.seeker.fitness.all.util.PracticalUtil;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

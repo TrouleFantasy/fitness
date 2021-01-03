@@ -1,14 +1,20 @@
 package com.seeker.fitness.all.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.Date;
 
 /**
  * 食物父类，主要保存四项日志
  */
 public class BaseEntity {
+    @JSONField(serialize=false)
     protected Integer addUser;//'添加人',
+    @JSONField(serialize = false)
     protected Integer modifyUser;//'最后修改人',
+    @JSONField(serialize = false)
     protected Date addDate;//'添加时间',
+    @JSONField(serialize = false)
     protected Date modifyDate;//'最后修改时间'
 
     public void info(){

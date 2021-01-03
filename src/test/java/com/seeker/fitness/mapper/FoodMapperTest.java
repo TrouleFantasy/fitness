@@ -3,7 +3,7 @@ package com.seeker.fitness.mapper;
 import com.seeker.fitness.all.entity.Food;
 import com.seeker.fitness.all.entity.FoodType;
 import com.seeker.fitness.all.mapper.FoodMapper;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

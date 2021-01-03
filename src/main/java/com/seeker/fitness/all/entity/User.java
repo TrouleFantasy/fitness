@@ -1,5 +1,7 @@
 package com.seeker.fitness.all.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -7,12 +9,14 @@ public class User extends BaseEntity {
     private Integer id;//id
     private String userName;//昵称 NotNUll
     private String userCode;//账号 NotNUll
+    @JSONField(serialize = false)
     private String password;//密码 NotNUll
     private String name;//姓名
     private Integer sex;//性别 NotNUll
     private Integer age;//年龄 NotNUll
     private Integer fitnessDay;//健身时长(天)
     private String region;//地区
+    @JSONField(format = "yyyy-MM-dd")
     private Date birthDate;//出生日期 NotNUll
     private Integer stature;//身高(cm)
     private Integer weight;//体重(g)
