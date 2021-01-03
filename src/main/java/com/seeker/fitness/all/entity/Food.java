@@ -18,6 +18,7 @@ public class Food extends BaseEntity{
     private Double kcal;//大卡
     private Double kj;//千焦
     private Integer type;//种类
+    private String image;//图片地址
     private String chType;//种类中文名
     private Double weight;//重量 单位:克
 
@@ -250,6 +251,7 @@ public class Food extends BaseEntity{
                 ", type=" + type +
                 ", chType='" + chType + '\'' +
                 ", weight=" + weight +
+                ", image=" + image +
                 "} " + super.toString();
     }
 
@@ -301,6 +303,10 @@ public class Food extends BaseEntity{
         return type;
     }
 
+    public String getImage(){
+        return image;
+    }
+
     public void setFid(Integer fid) {
         this.fid = fid;
     }
@@ -347,6 +353,10 @@ public class Food extends BaseEntity{
 
     public void setChType(String chType) {
         this.chType = chType;
+    }
+
+    public void setImage(String image){
+        this.image=image;
     }
 
 }

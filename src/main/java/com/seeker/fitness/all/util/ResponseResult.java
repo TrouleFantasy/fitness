@@ -1,5 +1,7 @@
 package com.seeker.fitness.all.util;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class ResponseResult<T> {
     private Integer status;
     private String message;
@@ -54,5 +56,22 @@ public class ResponseResult<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseResult{" +
+                "status=" + status +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                '}';
+    }
+
+    /**
+     * 将当前对象转换为JSON字符串
+     * @return
+     */
+    public String toJSONString(){
+        return JSONObject.toJSONString(this);
     }
 }

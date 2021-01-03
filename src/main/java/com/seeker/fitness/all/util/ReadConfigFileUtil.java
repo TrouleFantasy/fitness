@@ -29,6 +29,25 @@ public class ReadConfigFileUtil {
             return null;
         }
     }
+    /**
+     * 读取默认的application.yml配置文件
+     * 此种获取方式可以兼容环境的变化：Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath)
+     * Thread.currentThread() --获取当前进程相关信息对象
+     * getContextClassLoader() --获取当前环境的ClassLoader对象
+     * getResourceAsStream(filePath) --用获取的ClassLoader对象调用此方法获取对应文件的输入流
+     * @return
+     */
+    public static Map<String,Object> getYaml(){
+        try(InputStream resourceAsStream=Thread.currentThread().getContextClassLoader().getResourceAsStream("application.yml")){
+            Map<String,Object> yamlMap=null;
+            Yaml yaml=new Yaml();
+            yamlMap=yaml.load(resourceAsStream);
+            return  yamlMap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * 读取properties文件

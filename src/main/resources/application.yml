@@ -4,5 +4,16 @@ spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     password: Zjh990713_mysql
-    url: jdbc:mysql://localhost:3306/Fitness_foods?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/Fitness?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
+  #设置项目不返回null的数据
+  jackson:
+    default-property-inclusion: NON_EMPTY
+user:
+  tokenTimeOut: 120 #以秒为单位
+redis:
+  ip: 127.0.0.1
+  port: 6379
+  maxTotal: 10
+  maxIdle: 10
+  waitMill: 0
