@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
@@ -60,13 +61,29 @@ public class ContrllerTests {
     public void loginTest(){
         JSONObject loginObj=new JSONObject();
         loginObj.put("userCode","niceMy2015");
-        loginObj.put("password","qwer1234");
+        loginObj.put("password","qwer12345");
 
         RestTemplate restTemplate=new RestTemplate();
         HttpHeaders headers=new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> httpEntity=new HttpEntity<>(JSONObject.toJSONString(loginObj),headers);
-        String result=restTemplate.postForObject("http://127.0.0.1:8081/users/login",httpEntity,String.class);
+        ResponseEntity result=restTemplate.postForEntity("http://127.0.0.1:8081/users/login",httpEntity,String.class);
+        System.out.println(result);
+    }
+    @Test
+    public void updatePasswordTest(){
+        JSONObject updateObj=new JSONObject();
+        updateObj.put("userCode","niceMy2015");
+        updateObj.put("oldPassword","qwer1234");
+        updateObj.put("newPassword","qwer12345");
+        updateObj.put("reNewPassword","qwer12345");
+
+        RestTemplate restTemplate=new RestTemplate();
+        HttpHeaders headers=new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("token","df9564e4fb5b8c3325831744e0b4818e");
+        HttpEntity<String> httpEntity=new HttpEntity<>(JSONObject.toJSONString(updateObj),headers);
+        String result=restTemplate.postForObject("http://127.0.0.1:8081/users/updatePassword",httpEntity,String.class);
         System.out.println(result);
     }
 

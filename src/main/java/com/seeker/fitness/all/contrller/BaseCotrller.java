@@ -1,6 +1,7 @@
 package com.seeker.fitness.all.contrller;
 
 import com.seeker.fitness.all.ex.AddFoodException;
+import com.seeker.fitness.all.ex.DataBasesException;
 import com.seeker.fitness.all.ex.InputAnomalyException;
 import com.seeker.fitness.all.ex.ServiceException;
 import com.seeker.fitness.all.util.ResponseResult;
@@ -32,6 +33,9 @@ public class BaseCotrller {
             //500
             responseResult.setStatus(500);
             responseResult.setMessage("获取IO流异常!");
+        }else if(ex instanceof DataBasesException){
+            //999 数据相关错误
+            responseResult.setStatus(999);
         }
         return responseResult;
     }

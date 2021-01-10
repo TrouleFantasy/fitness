@@ -50,8 +50,11 @@ public class UserDynamicSqlProvider {
                 if(user.getStatus()!=null){
                     SET("status=#{status}");
                 }
-                if(user.getTonken()!=null){
-                    SET("tonken=#{tonken}");
+                if(user.getToken()!=null){
+                    SET("token=#{token}");
+                }
+                if(user.getSalt()!=null){
+                    SET("salt=#{salt}");
                 }
                 if(user.getUserInfo()!=null){
                     SET("user_info=#{userInfo}");

@@ -21,6 +21,10 @@ public class ProjectConfig extends WebMvcConfigurationSupport {
     @Autowired
     UserInterceptor userInterceptor;
 
+    /**
+     *  为项目设置拦截器
+     * @param registry
+     */
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         //添加不必拦截的url集合

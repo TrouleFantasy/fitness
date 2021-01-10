@@ -92,7 +92,7 @@ public interface FoodMapper {
      * 新增一种食物
      * @param food
      */
-    @Insert("INSERT INTO food_table(name,carbohydrate,protein,fat,fiber,sodium,kcal,kj,type,add_user,modify_user,add_date,modify_date) VALUES(#{name},#{carbohydrate},#{protein},#{fat},#{fiber},#{sodium},#{kcal},#{kj},#{type},#{addUser},#{modifyUser},#{addDate},#{modifyDate})")
+    @Insert("INSERT INTO food_table(name,carbohydrate,protein,fat,fiber,sodium,kcal,kj,type,image,valid,add_user,modify_user,add_date,modify_date) VALUES(#{name},#{carbohydrate},#{protein},#{fat},#{fiber},#{sodium},#{kcal},#{kj},#{type},#{image},#{valid},#{addUser},#{modifyUser},#{addDate},#{modifyDate})")
     Integer addFood(Food food);
 
 }

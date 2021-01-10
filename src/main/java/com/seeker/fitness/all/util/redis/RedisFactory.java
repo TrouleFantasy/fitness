@@ -16,22 +16,27 @@ public class RedisFactory {
     private static int port;
     private static int maxTotal;
     private static int maxIdle;
+    private static String password;
 
     @Value("${redis.ip}")
-    public  void setIp(String ip) {
+    private  void setIp(String ip) {
         RedisFactory.ip = ip;
     }
     @Value("${redis.port}")
-    public  void setPort(int port) {
+    private  void setPort(int port) {
         RedisFactory.port = port;
     }
     @Value("${redis.maxTotal}")
-    public  void setMaxTotal(int maxTotal) {
+    private  void setMaxTotal(int maxTotal) {
         RedisFactory.maxTotal = maxTotal;
     }
     @Value("${redis.maxIdle}")
-    public  void setMaxIdle(int maxIdle) {
+    private  void setMaxIdle(int maxIdle) {
         RedisFactory.maxIdle = maxIdle;
+    }
+    @Value("${redis.password}")
+    private   void setPassword(String password) {
+        RedisFactory.password = password;
     }
     @PostConstruct
     private void init() {
@@ -45,11 +50,13 @@ public class RedisFactory {
 //        config.setMaxWaitMillis(waitMill);
         //在borrow一个jedis实例时，是否提前进行validate操作；如果为true，则得到的jedis实例均是可用的；
 //        config.setTestOnBorrow(true);
-        jedisPool = new JedisPool(config,ip,port);
+        RedisFactory.jedisPool = new JedisPool(config,ip,port);
     }
 
     public static Jedis getJedis(){
-        return jedisPool.getResource();
+        Jedis jedis=jedisPool.getResource();
+//        jedis.auth(password);
+        return jedis;
     }
 
 }

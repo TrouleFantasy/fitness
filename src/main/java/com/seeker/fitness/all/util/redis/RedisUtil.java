@@ -1,6 +1,6 @@
 package com.seeker.fitness.all.util.redis;
 
-import com.seeker.fitness.all.util.ConfigParamMapping;
+import com.seeker.fitness.all.config.ConfigParamMapping;
 import com.seeker.fitness.all.util.PracticalUtil;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;

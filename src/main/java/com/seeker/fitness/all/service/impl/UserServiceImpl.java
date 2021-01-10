@@ -1,16 +1,18 @@
 package com.seeker.fitness.all.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.seeker.fitness.all.config.ConfigParamMapping;
 import com.seeker.fitness.all.entity.User;
+import com.seeker.fitness.all.ex.DataBasesException;
+import com.seeker.fitness.all.ex.ServiceException;
 import com.seeker.fitness.all.mapper.UserMapper;
 import com.seeker.fitness.all.service.UserService;
 import com.seeker.fitness.all.util.PracticalUtil;
 import com.seeker.fitness.all.util.ResponseResult;
+import com.seeker.fitness.all.util.Token;
 import com.seeker.fitness.all.util.redis.RedisFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
@@ -21,8 +23,6 @@ import java.util.Date;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
-    @Value("${user.tokenTimeOut}")
-    private Long tokenTimeOut;
     /**
      *用户注册接口
      * @param user
@@ -57,9 +57,11 @@ public class UserServiceImpl implements UserService {
             return ResponseResult.errorResponse("phoneNumber字段不能为空！");
         }
         //开始数据操作
+        //制造盐值
+        String salt=PracticalUtil.createSecureSalt();
+        user.setSalt(salt);
         //密码加密
-        String password=user.getPassword();
-        String Md5Password= DigestUtils.md5DigestAsHex(password.getBytes());
+        String Md5Password=PracticalUtil.createSecurePassword(user.getPassword(),salt);
         user.setPassword(Md5Password);
         //计算年龄
         Date birthDate=user.getBirthDate();
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService {
         //开始写入数据库
         Integer resultInt=userMapper.addUser(user);
         if(resultInt!=1){
-            return ResponseResult.errorResponse("写入信息时发生异常！请联系管理员！");
+            throw new DataBasesException("注册失败！请联系管理员！");
         }
         return ResponseResult.successResponse();
     }
@@ -99,18 +101,19 @@ public class UserServiceImpl implements UserService {
             if(resultUser==null||resultUser.getValid()!=1){
                 return ResponseResult.errorResponse("无效用户！");
             }
-            //获取数据库中储存的用户密码
+            //获取数据库中储存的用户密码与盐值
             String resultPassword=resultUser.getPassword();
-            //将入参中的密码加密后与数据库中储存的密码对比
-            String md5Password=DigestUtils.md5DigestAsHex(password.getBytes());
-            //如果不一致则返回错误
-            if(!resultPassword.equals(md5Password)){
+            String salt=resultUser.getSalt();
+            //将入参中的密码加密后与数据库中储存的密码对比 如果不一致则返回错误
+            if(!PracticalUtil.comparisonPassword(resultPassword,password,salt)){
                 return ResponseResult.errorResponse("密码不正确！");
             }
 
             //如果一致则准许登录 返回用户信息并发放token
             //生成token
-            String token=PracticalUtil.createToken(userCode);
+            Token tokenObj=new Token();
+            tokenObj.setUserCode(userCode);
+            String token= tokenObj.toTokenString();
             //将token放置在响应头中
             response.setHeader("token",token);
             //写入redis
@@ -118,7 +121,7 @@ public class UserServiceImpl implements UserService {
             Jedis jedis=RedisFactory.getJedis();
             //设置一个键值对 并设置超时时间 此时间就是token的过期时间
             jedis.set(token,userCode);
-            jedis.expireAt(token,PracticalUtil.getTimeStamp(tokenTimeOut));
+            jedis.expireAt(token,PracticalUtil.getTimeStamp(ConfigParamMapping.getTokenTimeOut()));
             //释放连接
             jedis.close();
             return ResponseResult.successResponse(resultUser.toResponseUser());
@@ -127,5 +130,56 @@ public class UserServiceImpl implements UserService {
             return ResponseResult.errorResponse("解析报文时出现异常！");
         }
 
+    }
+
+    /**
+     * 用户通过旧密码 修改密码
+     * @param updateObj
+     * @return
+     */
+    public ResponseResult passwordModify(JSONObject updateObj) {
+        try{
+            String userCode=updateObj.getString("userCode");
+            String oldPassword=updateObj.getString("oldPassword");
+            String newPassword=updateObj.getString("newPassword");
+            String reNewPassword=updateObj.getString("reNewPassword");
+            if(StringUtils.isEmpty(userCode)){
+                return ResponseResult.errorResponse("userCode字段不能为空！");
+            }
+            if(StringUtils.isEmpty(oldPassword)){
+                return ResponseResult.errorResponse("password字段不能为空！");
+            }
+            if(StringUtils.isEmpty(newPassword)){
+                return ResponseResult.errorResponse("newPassword字段不能为空！");
+            }
+            if(StringUtils.isEmpty(reNewPassword)){
+                return ResponseResult.errorResponse("reNewPassword字段不能为空！");
+            }
+            User resultUser=userMapper.getUserByUserCode(userCode);
+            String resultPassword=resultUser.getPassword();
+            String resultSalt=resultUser.getSalt();
+            if(!PracticalUtil.comparisonPassword(resultPassword,oldPassword,resultSalt)){
+                return ResponseResult.errorResponse("旧密码输入错误！");
+            }
+            if(!newPassword.equals(reNewPassword)){
+                return ResponseResult.errorResponse("两次新密码输入不一致！");
+            }
+
+            //开始数据操作
+            User newPassUser=new User();
+            newPassUser.setId(resultUser.getId());
+            String secureNewPassword=PracticalUtil.createSecurePassword(newPassword,resultSalt);
+            newPassUser.setPassword(secureNewPassword);
+            Integer resultInt=userMapper.updateUser(newPassUser);
+            if(resultInt!=1){
+                throw new DataBasesException("密码修改失败！请联系管理员！");
+            }
+            return ResponseResult.successResponse("密码修改成功！");
+        }catch (ServiceException e){
+            throw e;
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseResult.errorResponse("密码修改失败！");
+        }
     }
 }

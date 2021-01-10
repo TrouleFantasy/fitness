@@ -24,17 +24,18 @@ public class User extends BaseEntity {
     private String email;//邮箱
     private String motto;//个性签名
     private Integer status;//是否在线 0-离线 1-在线
-    private String tonken;//登陆凭证
+    private String token;//登陆凭证
+    private String salt;//密码盐值
     private String userInfo;//用户介绍
-    private Integer valid;//数据是否有效 0-无效 1-有效
 
     public User toResponseUser(){
-        this.setTonken(null);
+        this.setToken(null);
         this.setPassword(null);
         this.setModifyUser(null);
         this.setModifyDate(null);
         this.setAddUser(null);
         this.setAddDate(null);
+        this.setSalt(null);
         return this;
     }
 
@@ -57,13 +58,14 @@ public class User extends BaseEntity {
                 ", email='" + email + '\'' +
                 ", motto='" + motto + '\'' +
                 ", status=" + status +
-                ", tonken='" + tonken + '\'' +
+                ", token='" + token + '\'' +
+                ", salt='" + salt + '\'' +
                 ", userInfo='" + userInfo + '\'' +
-                ", valid=" + valid +
                 ", addUser=" + addUser +
                 ", modifyUser=" + modifyUser +
                 ", addDate=" + addDate +
                 ", modifyDate=" + modifyDate +
+                ", valid=" + valid +
                 "} " + super.toString();
     }
 
@@ -79,6 +81,7 @@ public class User extends BaseEntity {
                 Objects.equals(name, user.name) &&
                 Objects.equals(sex, user.sex) &&
                 Objects.equals(age, user.age) &&
+                Objects.equals(fitnessDay, user.fitnessDay) &&
                 Objects.equals(region, user.region) &&
                 Objects.equals(birthDate, user.birthDate) &&
                 Objects.equals(stature, user.stature) &&
@@ -87,14 +90,14 @@ public class User extends BaseEntity {
                 Objects.equals(email, user.email) &&
                 Objects.equals(motto, user.motto) &&
                 Objects.equals(status, user.status) &&
-                Objects.equals(tonken, user.tonken) &&
-                Objects.equals(userInfo, user.userInfo) &&
-                Objects.equals(valid, user.valid);
+                Objects.equals(token, user.token) &&
+                Objects.equals(salt, user.salt) &&
+                Objects.equals(userInfo, user.userInfo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, userCode, password, name, sex, age, region, birthDate, stature, weight, phoneNumber, email, motto, status, tonken, userInfo, valid);
+        return Objects.hash(id, userName, userCode, password, name, sex, age, fitnessDay, region, birthDate, stature, weight, phoneNumber, email, motto, status, token, salt, userInfo);
     }
 
     public Integer getId() {
@@ -217,12 +220,20 @@ public class User extends BaseEntity {
         this.status = status;
     }
 
-    public String getTonken() {
-        return tonken;
+    public String getToken() {
+        return token;
     }
 
-    public void setTonken(String tonken) {
-        this.tonken = tonken;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public String getUserInfo() {
@@ -231,14 +242,6 @@ public class User extends BaseEntity {
 
     public void setUserInfo(String userInfo) {
         this.userInfo = userInfo;
-    }
-
-    public Integer getValid() {
-        return valid;
-    }
-
-    public void setValid(Integer valid) {
-        this.valid = valid;
     }
 
     public Integer getFitnessDay() {

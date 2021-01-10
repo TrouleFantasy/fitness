@@ -8,9 +8,12 @@ spring:
     username: root
 user:
   tokenTimeOut: 1800 #以秒为单位
+  secret: Zjh990713_fitnessProject
+
 redis:
   ip: 127.0.0.1
   port: 6379
   maxTotal: 10
   maxIdle: 10
   waitMill: 0
+  password: Zjh990713_redis

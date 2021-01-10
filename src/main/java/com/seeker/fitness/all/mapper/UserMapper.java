@@ -12,7 +12,7 @@ public interface UserMapper {
      * @param user
      * @return
      */
-    @Insert("INSERT INTO user_list(user_name,user_code,password,name,sex,age,fitness_day,region,birth_date,stature,weight,phone_number,email,motto,status,tonken,user_info,valid,add_user,modify_user,add_date,modify_date) VALUES(#{userName},#{userCode},#{password},#{name},#{sex},#{age},#{fitnessDay},#{region},#{birthDate},#{stature},#{weight},#{phoneNumber},#{email},#{motto},#{status},#{tonken},#{userInfo},#{valid},#{addUser},#{modifyUser},#{addDate},#{modifyDate})")
+    @Insert("INSERT INTO user_list(user_name,user_code,password,name,sex,age,fitness_day,region,birth_date,stature,weight,phone_number,email,motto,status,token,salt,user_info,valid,add_user,modify_user,add_date,modify_date) VALUES(#{userName},#{userCode},#{password},#{name},#{sex},#{age},#{fitnessDay},#{region},#{birthDate},#{stature},#{weight},#{phoneNumber},#{email},#{motto},#{status},#{token},#{salt},#{userInfo},#{valid},#{addUser},#{modifyUser},#{addDate},#{modifyDate})")
     Integer addUser(User user);
 
     /**
@@ -59,7 +59,7 @@ public interface UserMapper {
 ////            "<if test=\"email != null\">, email=#{email}</if>"+
 ////            "<if test=\"motto != null\">, motto=#{motto}</if>"+
 ////            "<if test=\"status != null\">, status=#{status}</if>"+
-////            "<if test=\"tonken != null\">, tonken=#{tonken}</if>"+
+////            "<if test=\"token != null\">, token=#{token}</if>"+
 ////            "<if test=\"userInfo != null\">, user_info=#{userInfo}</if>"+
 ////            "<if test=\"valid != null\">, valid=#{valid}</if>"+
 ////            "<if test=\"modifyUser != null\">, modify_user=#{modifyUser}</if>"+

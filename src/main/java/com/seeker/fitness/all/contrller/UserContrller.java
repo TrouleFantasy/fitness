@@ -37,5 +37,13 @@ public class UserContrller {
         return userService.userLogin(loginObj,response);
     }
 
-
+    /**
+     * 用户密码修改
+     * @param updateObj
+     * @return
+     */
+    @RequestMapping("updatePassword")
+    public ResponseResult updatePassword(@RequestBody JSONObject updateObj){
+        return userService.passwordModify(updateObj);
+    }
 }

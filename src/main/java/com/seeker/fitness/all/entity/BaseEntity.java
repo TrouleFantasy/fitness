@@ -5,23 +5,25 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.Date;
 
 /**
- * 食物父类，主要保存四项日志
+ * 实体父类，主要保存数据相关的通用字段
  */
 public class BaseEntity {
     @JSONField(serialize=false)
-    protected Integer addUser;//'添加人',
+    protected Integer addUser;//添加人
     @JSONField(serialize = false)
-    protected Integer modifyUser;//'最后修改人',
+    protected Integer modifyUser;//最后修改人
     @JSONField(serialize = false)
-    protected Date addDate;//'添加时间',
+    protected Date addDate;//添加时间
     @JSONField(serialize = false)
-    protected Date modifyDate;//'最后修改时间'
+    protected Date modifyDate;//最后修改时间
+    protected Integer valid;//数据是否有效 0-无效 1-有效
 
     public void info(){
         System.out.println("添加人:"+addUser);
         System.out.println("最后修改人:"+modifyUser);
         System.out.println("添加时间:"+addDate);
         System.out.println("最后修改时间:"+modifyDate);
+        System.out.println("数据是否有效:"+valid);
     }
 
     @Override
@@ -31,6 +33,7 @@ public class BaseEntity {
                 ", modifyUser=" + modifyUser +
                 ", addDate=" + addDate +
                 ", modifyDate=" + modifyDate +
+                ", valid=" + valid +
                 '}';
     }
 
@@ -64,5 +67,13 @@ public class BaseEntity {
 
     public void setModifyDate(Date modifyDate) {
         this.modifyDate = modifyDate;
+    }
+
+    public Integer getValid() {
+        return valid;
+    }
+
+    public void setValid(Integer valid) {
+        this.valid = valid;
     }
 }

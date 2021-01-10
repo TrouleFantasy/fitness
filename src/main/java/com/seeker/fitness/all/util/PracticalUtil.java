@@ -4,7 +4,9 @@ import org.springframework.util.DigestUtils;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -120,7 +122,85 @@ public class PracticalUtil {
         }
         return token;
     }
+    /**
+     * 将给定字符串用base64编码
+     * @param source
+     * @return
+     */
+    public static String base64Encoder(String source){
+        try {
+            Base64.Encoder encoder=Base64.getEncoder();
+            byte[] sourceByte=source.getBytes("UTF-8");
+            return encoder.encodeToString(sourceByte);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
+    /**
+     * 将给定字符串用base64解码
+     * @param source
+     * @return
+     */
+    public static String base64Decoder(String source){
+        try{
+            Base64.Decoder decoder=Base64.getDecoder();
+            byte[] sourceByte=decoder.decode(source);
+            return new String(sourceByte,"UTF-8");
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * 制造安全的密码
+     * @param password
+     * @return
+     */
+    public static String createSecurePassword(String password,String salt){
+        if(salt==null){
+            salt="";
+        }
+        String readyPass=salt+password+salt;
+        String MD5Password=DigestUtils.md5DigestAsHex(readyPass.getBytes());
+        for(int i=0;i<10;i++){
+            String md5Salt=salt+MD5Password+salt;
+            MD5Password=DigestUtils.md5DigestAsHex(md5Salt.getBytes());
+        }
+        return MD5Password;
+    }
+
+    /**
+     * 比对密码
+     * @param password
+     * @param resultPassword
+     * @param salt
+     * @return
+     */
+    public static boolean comparisonPassword(String resultPassword,String password,String salt){
+        String md5Password=createSecurePassword(password,salt);
+        if(resultPassword.equals(md5Password)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //-------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * 制造盐值
+     * @return
+     */
+    public static String createSecureSalt(){
+        Random random=new Random();
+        int s=random.nextInt(22);
+        int e=s+10;
+        return UUID.randomUUID().toString().replace("-","").substring(s,e);
+    }
     //-------------------------------------------------------------------------------------------------------------------
 
     /**

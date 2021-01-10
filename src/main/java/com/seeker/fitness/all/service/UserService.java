@@ -23,4 +23,11 @@ public interface UserService {
      * @return
      */
     ResponseResult userLogin(JSONObject loginObj,HttpServletResponse response);
+
+    /**
+     * 用户通过旧密码 修改密码
+     * @param updateObj
+     * @return
+     */
+    ResponseResult passwordModify(JSONObject updateObj);
 }
