@@ -109,20 +109,6 @@ public class PracticalUtil {
     //-------------------------------------------------------------------------------------------------------------------
 
     /**
-     * 统一生成token的方法
-     * @return
-     */
-    public static String createToken(String salt){
-        String uid=UUID.nameUUIDFromBytes(salt.getBytes()).toString().replace("-","");
-        String dateStr=new Date().toString();
-        String allStr="fitness"+uid+salt+dateStr;
-        String token= DigestUtils.md5DigestAsHex(allStr.getBytes());
-        for(int i=0;i<10;i++){
-            token=DigestUtils.md5DigestAsHex(token.getBytes());
-        }
-        return token;
-    }
-    /**
      * 将给定字符串用base64编码
      * @param source
      * @return
@@ -212,17 +198,15 @@ public class PracticalUtil {
     }
 
     /**
-     * 传入一个秒数s 返回s秒后的时间戳
-     * @param s
+     * 传入一个毫秒数ms 返回ms毫秒后的时间戳
+     * @param ms
      * @return
      */
-    public static Long getTimeStamp(Long s){
+    public static Long getTimeStamp(Long ms){
         //当前时间戳 毫秒数
         Long nowTimeStampMS=new Date().getTime();
-        //转换为秒
-        Long nowTimeStampS=nowTimeStampMS/1000;
         //加上传入的秒数
-        Long nowTimeStamp=nowTimeStampS+s;
+        Long nowTimeStamp=nowTimeStampMS+ms;
         return nowTimeStamp;
     }
 

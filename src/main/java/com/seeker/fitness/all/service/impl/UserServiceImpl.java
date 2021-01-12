@@ -94,6 +94,8 @@ public class UserServiceImpl implements UserService {
         if(StringUtils.isEmpty(password)){
             return ResponseResult.errorResponse("password不得为空！");
         }
+        //获取一个redis连接
+        Jedis jedis=RedisFactory.getJedis();
         try {
             //判断密码正确性
             //根据账号查找对应用户信息
@@ -113,21 +115,24 @@ public class UserServiceImpl implements UserService {
             //生成token
             Token tokenObj=new Token();
             tokenObj.setUserCode(userCode);
+            tokenObj.setJti(PracticalUtil.createSecureSalt());
+            tokenObj.setExp(String.valueOf(PracticalUtil.getTimeStamp(new Date().getTime())));//到期时间
+            tokenObj.setIat(String.valueOf(new Date().getTime()));//签发时间
             String token= tokenObj.toTokenString();
             //将token放置在响应头中
             response.setHeader("token",token);
             //写入redis
-            //获取一个redis连接
-            Jedis jedis=RedisFactory.getJedis();
-            //设置一个键值对 并设置超时时间 此时间就是token的过期时间
-            jedis.set(token,userCode);
-            jedis.expireAt(token,PracticalUtil.getTimeStamp(ConfigParamMapping.getTokenTimeOut()));
-            //释放连接
-            jedis.close();
+            //向用户redis登陆集合中放入此登陆用户
+            jedis.sadd("loginUserList",userCode);
+            //设置一个hash表 表名为对应的userCode token为键 过期时间为值
+            jedis.hset(userCode,token,String.valueOf(PracticalUtil.getTimeStamp(ConfigParamMapping.getTokenTimeOut())));
             return ResponseResult.successResponse(resultUser.toResponseUser());
         }catch (Exception e){
             e.printStackTrace();
             return ResponseResult.errorResponse("解析报文时出现异常！");
+        }finally {
+            //释放连接
+            jedis.close();
         }
 
     }
