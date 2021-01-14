@@ -15,15 +15,30 @@ public class ConfigParamMapping {
     //毫秒为单位
     private static Long tokenTimeOut;
     private static Long scheduleCleanTokenTime;
+    private static Long scheduleStartCleanTokenTime;
+    private static String tokenSpaceMark;
+    private static Integer tokenTotal;
     private static String secret;
     private static String redisLoginTableName;
     @Value("${user.tokenTimeOut}")
     private void setTokenTimeOut(String tokenTimeOutStr) {
         ConfigParamMapping.tokenTimeOut = parseTimeLong(tokenTimeOutStr);
     }
+    @Value("${user.tokenTotal}")
+    private void setTokenTotal(Integer tokenTotal) {
+        ConfigParamMapping.tokenTotal =tokenTotal;
+    }
+    @Value("${user.tokenSpaceMark}")
+    private void setTokenSpaceMark(String tokenSpaceMark) {
+        ConfigParamMapping.tokenSpaceMark = tokenSpaceMark;
+    }
     @Value("${user.scheduleCleanTokenTime}")
     private void setScheduleCleanTokenTime(String scheduleCleanTokenTimeStr) {
         ConfigParamMapping.scheduleCleanTokenTime = parseTimeLong(scheduleCleanTokenTimeStr);
+    }
+    @Value("${user.scheduleStartCleanTokenTime}")
+    private void setScheduleStartCleanTokenTime(String scheduleStartCleanTokenTime) {
+        ConfigParamMapping.scheduleStartCleanTokenTime = parseTimeLong(scheduleStartCleanTokenTime);
     }
 
     @Value("${user.secret}")
@@ -44,8 +59,20 @@ public class ConfigParamMapping {
         return tokenTimeOut;
     }
 
+    public static String getTokenSpaceMark() {
+        return tokenSpaceMark;
+    }
+
+    public static Integer getTokenTotal() {
+        return tokenTotal;
+    }
+
     public static Long getScheduleCleanTokenTime() {
         return scheduleCleanTokenTime;
+    }
+
+    public static Long getScheduleStartCleanTokenTime() {
+        return scheduleStartCleanTokenTime;
     }
 
     public static String getSecret() {

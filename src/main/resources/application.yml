@@ -7,10 +7,13 @@ spring:
     url: jdbc:mysql://localhost:3306/Fitness?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
 user:
-  redisLoginTableName: loginUserList
-  tokenTimeOut: 600s #s秒 ms毫秒
-  scheduleCleanTokenTime: 120s #s秒 ms毫秒
-  secret: Zjh990713_fitnessProject
+  redisLoginTableName: loginUserList #已登陆用户记录集合名
+  tokenTotal: 5      #每个用户最多拥有token数量
+  tokenTimeOut: 600s #token超时时间｜s秒 ms毫秒
+  tokenSpaceMark: -- #token信息间隔符
+  scheduleStartCleanTokenTime: 0s #项目启动后开始清理token时间｜s秒 ms毫秒
+  scheduleCleanTokenTime: 120s #清理token间隔时间｜s秒 ms毫秒
+  secret: Zjh990713_fitnessProject #token密钥
 
 redis:
   ip: 127.0.0.1

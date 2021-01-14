@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.entity.User;
 import com.seeker.fitness.all.util.ResponseResult;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -22,7 +23,7 @@ public interface UserService {
      * @param loginObj
      * @return
      */
-    ResponseResult userLogin(JSONObject loginObj,HttpServletResponse response);
+    ResponseResult userLogin(JSONObject loginObj, HttpServletResponse response, HttpServletRequest request);
 
     /**
      * 用户通过旧密码 修改密码

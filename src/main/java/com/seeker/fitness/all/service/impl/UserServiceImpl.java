@@ -11,13 +11,17 @@ import com.seeker.fitness.all.util.PracticalUtil;
 import com.seeker.fitness.all.util.ResponseResult;
 import com.seeker.fitness.all.util.Token;
 import com.seeker.fitness.all.util.redis.RedisFactory;
+import com.seeker.fitness.all.util.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -85,7 +89,7 @@ public class UserServiceImpl implements UserService {
      * @param loginObj
      * @return
      */
-    public ResponseResult userLogin(JSONObject loginObj, HttpServletResponse response) {
+    public ResponseResult userLogin(JSONObject loginObj, HttpServletResponse response, HttpServletRequest request) {
         String userCode=loginObj.getString("userCode");
         String password=loginObj.getString("password");
         if(StringUtils.isEmpty(userCode)){
@@ -97,12 +101,12 @@ public class UserServiceImpl implements UserService {
         //获取一个redis连接
         Jedis jedis=RedisFactory.getJedis();
         try {
-            //判断密码正确性
             //根据账号查找对应用户信息
             User resultUser=userMapper.getUserByUserCode(userCode);
             if(resultUser==null||resultUser.getValid()!=1){
                 return ResponseResult.errorResponse("无效用户！");
             }
+            //判断密码正确性
             //获取数据库中储存的用户密码与盐值
             String resultPassword=resultUser.getPassword();
             String salt=resultUser.getSalt();
@@ -111,7 +115,53 @@ public class UserServiceImpl implements UserService {
                 return ResponseResult.errorResponse("密码不正确！");
             }
 
-            //如果一致则准许登录 返回用户信息并发放token
+            //第1种情况-已经登陆过
+            //由于token的发放需要细化到访问者的 访问工具 每台设备相同的访问工具只能拥有一个token 所以需要校验
+            //获取用户设备的 ip地址   获取用户的 客户端信息
+            String userAgentInfo=PracticalUtil.getIpAddress(request)+ConfigParamMapping.getTokenSpaceMark()+request.getHeader("User-Agent");
+            //判断登陆记录表中是否有此用户
+            boolean sismember=jedis.sismember(ConfigParamMapping.getRedisLoginTableName(),userCode);
+            //如果为true 则说明这个用户已经登陆 则去查该用户对应的token信息表
+            if(sismember){
+                //以下代码均为了确定此次请求登陆的用户是否是在同一设备上的同一客户端登陆 如不是则可以继续登陆验证
+                Map<String, String> userTokenInfoMap=jedis.hgetAll(userCode);
+                Set<Map.Entry<String,String>> entrySet=userTokenInfoMap.entrySet();
+                for(Map.Entry<String,String> entry:entrySet){
+                    String key=entry.getKey();
+                    String userTokenInfo=entry.getValue();
+                    //取出token信息中 用户信息段
+                    String resultUserAgentInfo=PracticalUtil.headGetStringByRegex(".*?"+ConfigParamMapping.getTokenSpaceMark(),userTokenInfo,true);
+                    if(userAgentInfo.equals(resultUserAgentInfo)){
+                        //此做法不适用于 用户关闭浏览器后 丢失token的情况 如果出现这种情况 用户只能等到token到期后才能够再次登陆
+                        //return ResponseResult.errorResponse("用户已登陆,请勿重复操作！");
+
+                        //所以可以将之前的token返回给用户 并刷新有效时间
+                        //将token放置在响应头中
+                        response.setHeader("token",key);
+                        //刷新有效时间
+                        RedisUtil.tokenRenewal(key,jedis);
+                        //返回对应用户信息
+                        return  ResponseResult.successResponse(resultUser.toResponseUser());
+                    }
+                }
+            }
+
+
+            //第2种情况-未登陆过
+            //如果密码正确且没有用同一设备同一客户端登陆过则准许登录 返回用户信息并发放token
+
+            //并且这种情况下有可能会超出最大登陆数的限制 如果超出则下线最早登陆的那一个
+            //判断该用户在此次登陆后是否会超出最大登陆数
+            if(jedis.hlen(userCode)>=ConfigParamMapping.getTokenTotal()){
+                //首先清理该用户不合法的token 包括超出数量的和已到期的
+                RedisUtil.violateToken(userCode,jedis);
+                //由于以上方法只会将token数控制在最大数量 但是我们现在需要最大数量-1个已有token 否则新发的token又将会超出最大数量 所以需要继续删除一个
+                //获取最先到期的那一个
+                String recentToken=RedisUtil.getRecentToken(userCode,jedis);
+                //删除最先到期的那一个
+                RedisUtil.deleteToken(userCode,recentToken,jedis);
+            }
+
             //生成token
             Token tokenObj=new Token();
             tokenObj.setUserCode(userCode);
@@ -123,10 +173,12 @@ public class UserServiceImpl implements UserService {
             response.setHeader("token",token);
             //写入redis
             //向用户redis登陆集合中放入此登陆用户
-            jedis.sadd("loginUserList",userCode);
+            jedis.sadd(ConfigParamMapping.getRedisLoginTableName(),userCode);
             //设置一个hash表 表名为对应的userCode token为键 过期时间为值
-            jedis.hset(userCode,token,String.valueOf(PracticalUtil.getTimeStamp(ConfigParamMapping.getTokenTimeOut())));
+            String tokenInfo=PracticalUtil.getTimeStamp(ConfigParamMapping.getTokenTimeOut())+ConfigParamMapping.getTokenSpaceMark()+userAgentInfo;
+            jedis.hset(userCode,token,tokenInfo);
             return ResponseResult.successResponse(resultUser.toResponseUser());
+
         }catch (Exception e){
             e.printStackTrace();
             return ResponseResult.errorResponse("解析报文时出现异常！");
@@ -179,6 +231,8 @@ public class UserServiceImpl implements UserService {
             if(resultInt!=1){
                 throw new DataBasesException("密码修改失败！请联系管理员！");
             }
+            //密码修改后 当前该用户所有的token都应当注销 删除该用户所有的token
+            RedisUtil.cleanAllToken(userCode);
             return ResponseResult.successResponse("密码修改成功！");
         }catch (ServiceException e){
             throw e;

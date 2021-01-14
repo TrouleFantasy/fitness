@@ -156,7 +156,7 @@ class TokenHeader{
 
     public TokenHeader(){
         typ="JWT";
-        alg="HS256";
+        alg="SHA256Hex";
     }
 
     public String toBase64String(){

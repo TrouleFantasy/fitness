@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -33,8 +34,8 @@ public class UserContrller {
      * @return
      */
     @RequestMapping("login")
-    public ResponseResult loginApi(@RequestBody JSONObject loginObj, HttpServletResponse response){
-        return userService.userLogin(loginObj,response);
+    public ResponseResult loginApi(@RequestBody JSONObject loginObj, HttpServletResponse response, HttpServletRequest request){
+        return userService.userLogin(loginObj,response,request);
     }
 
     /**
@@ -46,4 +47,5 @@ public class UserContrller {
     public ResponseResult updatePassword(@RequestBody JSONObject updateObj){
         return userService.passwordModify(updateObj);
     }
-}
+
+    }

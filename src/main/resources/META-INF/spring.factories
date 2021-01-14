@@ -1,0 +1,8 @@
+#此文件用于登记配置类，在此文件中登记的配置类不必使用@Configuration注解就
+# 可以被SpringBoot加载(优先级低于被@Configuration注解的类)
+# 并且可以使用以下三种注解来指定顺序(与被@Configuration注解的类无关),不指定则随机
+#@AutoConfigureBefore、@AutoConfigureAfter、@AutoConfigureOrder
+# Ordered.HIGHEST_PRECEDENCE(最高优先级)｜Ordered.LOWEST_PRECEDENCE 可以将这两个代表顺序的固定值作为启动顺序依据
+#@AutoConfigureOrder()的括号中
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.seeker.fitness.all.util.schedule.ProjectSchedule

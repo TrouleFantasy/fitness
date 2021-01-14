@@ -2,12 +2,13 @@ package com.seeker.fitness.all.util;
 
 import org.springframework.util.DigestUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.net.InetAddress;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 按照规律生成打印日志的标示，辅助查找日志
@@ -143,6 +144,43 @@ public class PracticalUtil {
     //-------------------------------------------------------------------------------------------------------------------
 
     /**
+     * 获取客户端IP地址
+     * @param request
+     * @return
+     */
+    public static  String getIpAddress(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknow".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+            if (ip.equals("127.0.0.1")) {
+                //根据网卡取本机配置的IP
+                InetAddress inet = null;
+                try {
+                    inet = InetAddress.getLocalHost();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ip = inet.getHostAddress();
+            }
+        }
+        // 多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
+        if (ip != null && ip.length() > 15) {
+            if (ip.indexOf(",") > 0) {
+                ip = ip.substring(0, ip.indexOf(","));
+            }
+        }
+        return ip;
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------
+
+    /**
      * 制造安全的密码
      * @param password
      * @return
@@ -175,7 +213,6 @@ public class PracticalUtil {
             return false;
         }
     }
-    //-------------------------------------------------------------------------------------------------------------------
 
     /**
      * 制造盐值
@@ -186,6 +223,101 @@ public class PracticalUtil {
         int s=random.nextInt(22);
         int e=s+10;
         return UUID.randomUUID().toString().replace("-","").substring(s,e);
+    }
+    //-------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * 将字符串数组转换为字符串
+     * @param strArr
+     * @param spaceMark
+     * @return
+     */
+    public static String arrayToString(String[] strArr,String spaceMark){
+        StringBuffer string=new StringBuffer();
+        for(int i=0;i<strArr.length;i++){
+            string.append(spaceMark).append(strArr[i]);
+        }
+        return string.toString().substring(spaceMark.length());
+    }
+
+    /**
+     * 从前往后匹配一次符合给定条件的字符 匹配即停
+     * @param regex
+     * @param materials
+     * @param inversion
+     * @return
+     */
+    public static String headGetStringByRegex(String regex,String materials,boolean inversion){
+        String result="";
+        //制造匹配模版
+        Pattern pattern=Pattern.compile(regex);
+        //管理模版与被匹配字符串 返回一个Matcher
+        Matcher matcher=pattern.matcher(materials);
+        //从头开始匹配 匹配即停
+        if(matcher.lookingAt()){
+            //赋值给返回值
+            result=matcher.group();
+            //判断inversion 是否反转
+            if(inversion){
+                result=arrayToString(materials.split(result),"");
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 循环匹配并返回符合给定条件的字符
+     * @param regex
+     * @param materials
+     * @param inversion
+     * @return
+     */
+    public static List<String> moreGetStringByRegex(String regex, String materials, boolean inversion){
+        List<String> results=new ArrayList<>();
+        //制造匹配模版
+        Pattern pattern=Pattern.compile(regex);
+        //管理模版与被匹配字符串 返回一个Matcher
+        Matcher matcher=pattern.matcher(materials);
+        //从头开始匹配 匹配即停
+        while (matcher.find()){
+            //获取到符合正则的字符串
+            String result=matcher.group();
+            //如果为true 则说明需要进行反转
+            if(inversion){
+                //获取到符合正则的字符串前面的字符
+                String cutStr=materials.substring(0,materials.indexOf(result));
+                //添加到返回集合中
+                if(!"".equals(cutStr)&&cutStr!=null){
+                    results.add(cutStr);
+                }
+                //将需要匹配的字符串进行剪短 主要是剪去已经匹配到的字符串以及已经添加到返回集合中的字符 如果不减将会出现结果性错误
+                materials=materials.replace(cutStr+result,"");
+            }else{
+                //为false则直接添加进返回集合
+                results.add(result);
+            }
+        }
+        //如果是需要反转的且在最后一次循环的时候result在materials中并不处于最后 这个时候将不会进入while循环 也就是不会将最后所剩的字符串假如返回集合中 在这里判断加一下
+        /*本取反时方法示例
+            原字符串：aa00bb一二aa11bb三四五aa22bb六七aa33bb八九十
+
+            materials值：
+            aa00bb一二aa11bb三四五aa22bb六七aa33bb八九十
+            一二aa11bb三四五aa22bb六七aa33bb八九十
+            三四五aa22bb六七aa33bb八九十
+            六七aa33bb八九十
+            八九十
+            ------------------
+            最后取反输出的值：
+            一二
+            三四五
+            六七
+            八九十
+        * */
+        if(inversion){
+            results.add(materials);
+        }
+        return results;
     }
     //-------------------------------------------------------------------------------------------------------------------
 

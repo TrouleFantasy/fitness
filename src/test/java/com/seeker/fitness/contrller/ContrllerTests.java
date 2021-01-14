@@ -61,10 +61,11 @@ public class ContrllerTests {
     public void loginTest(){
         JSONObject loginObj=new JSONObject();
         loginObj.put("userCode","niceMy2015");
-        loginObj.put("password","qwer12345");
+        loginObj.put("password","qwer1234");
 
         RestTemplate restTemplate=new RestTemplate();
         HttpHeaders headers=new HttpHeaders();
+        headers.set("User-Agent","LocalHostTest");
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> httpEntity=new HttpEntity<>(JSONObject.toJSONString(loginObj),headers);
         ResponseEntity result=restTemplate.postForEntity("http://127.0.0.1:8081/users/login",httpEntity,String.class);
@@ -74,9 +75,9 @@ public class ContrllerTests {
     public void updatePasswordTest(){
         JSONObject updateObj=new JSONObject();
         updateObj.put("userCode","niceMy2015");
-        updateObj.put("oldPassword","qwer1234");
-        updateObj.put("newPassword","qwer12345");
-        updateObj.put("reNewPassword","qwer12345");
+        updateObj.put("oldPassword","qwer12345");
+        updateObj.put("newPassword","qwer1234");
+        updateObj.put("reNewPassword","qwer1234");
 
         RestTemplate restTemplate=new RestTemplate();
         HttpHeaders headers=new HttpHeaders();
@@ -95,9 +96,9 @@ public class ContrllerTests {
         RestTemplate restTemplate=new RestTemplate();
         HttpHeaders headers=new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("token","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIzMjIwNzE3MjA2ODUwIiwiaWF0IjoiMTYxMDM1ODYwMzQyNSIsImp0aSI6IjJiMDVmZTZlZDMiLCJ1c2VyQ29kZSI6Im5pY2VNeTIwMTUifQ==.9a31aaa6288e8c9586eeed4d10b94615cd6942708df5177fe9e2f85f908fc92b");
+        headers.set("token","");
         HttpEntity<String> httpEntity=new HttpEntity<>(JSONObject.toJSONString(foodFindObj),headers);
-        String result=restTemplate.postForObject("http://127.0.0.1:8080/Fitness/foods/queryFoodsByName",httpEntity,String.class);
+        String result=restTemplate.postForObject("http://127.0.0.1:8081/foods/queryFoodsByName",httpEntity,String.class);
         System.out.println(result);
     }
 }
