@@ -31,6 +31,7 @@ public class ProjectConfig extends WebMvcConfigurationSupport {
         List<String> excludeUrls=new ArrayList<>();
         excludeUrls.add("/users/login");
         excludeUrls.add("/users/enrollUser");
+        excludeUrls.add("/sendMsg");
         //设置需要拦截的url以及不必拦截的url
         registry.addInterceptor(userInterceptor).addPathPatterns("/**").excludePathPatterns(excludeUrls);
     }

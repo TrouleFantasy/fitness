@@ -6,6 +6,23 @@ spring:
     password: Zjh990713_mysql
     url: jdbc:mysql://localhost:3306/Fitness?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
+  kafka:
+    #kafka服务器地址可以多个
+    bootstrap-servers: localhost:9092
+    producer:
+      #每次批量发送消息的数量
+      batch-size: 65536
+      #缓存大小
+      buffer-memory: 524288
+      #key-value的序列化
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      #指定一个默认的组名
+      group-id: test
+      #key-value的反序列化
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 user:
   redisLoginTableName: loginUserList #已登陆用户记录集合名
   tokenTotal: 5      #每个用户最多拥有token数量
@@ -22,3 +39,12 @@ redis:
   maxIdle: 10
   waitMill: 0
   password: Zjh990713_redis
+mongodb:
+  ip: 127.0.0.1
+  connectionsPerHost: 50
+  threadsAllowedToBlockForConnectionMultiplier: 50
+  maxWaitTime: 120s
+  connectTimeout: 60s
+  gridFS:
+    databaseName: storageTank
+    cllectionName: fs

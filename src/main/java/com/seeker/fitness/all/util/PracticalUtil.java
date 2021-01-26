@@ -341,6 +341,73 @@ public class PracticalUtil {
         Long nowTimeStamp=nowTimeStampMS+ms;
         return nowTimeStamp;
     }
+    /**
+     * 将指定带单位的字符串数值转换为Long类型
+     * @param timeStr
+     * @return
+     */
+    public static Long parseTimeLong(String timeStr){
+        //默认5分钟
+        Long timeLong=0L;
+        //不为空才进行赋值操作否则沿用默认数值
+        if(timeStr!=null&&!"".equals(timeStr)){
+            String timeStrLower=timeStr.toLowerCase();
+            //此map记录了不同单位与毫秒的进制关系 key为单位 value为进制
+            Map<String,Integer> map=new HashMap<>();
+            map.put("ms",1);
+            map.put("s",1000);
+
+            Set<Map.Entry<String,Integer>> set=map.entrySet();
+            for(Map.Entry<String,Integer> entry:set){
+                String key=entry.getKey();
+                Integer value=entry.getValue();
+                //正则表达式
+                String regex="^[0-9]*"+key+"$";
+                //判断此次循环的数值是否是所支持的单位
+                if(timeStrLower.matches(regex)){
+                    //如果是是直接去掉单位 转换为数值
+                    timeLong=Long.valueOf(timeStrLower.replaceAll("[^0-9]",""));
+                    //转换为毫秒
+                    return timeLong*=value;
+                }
+            }
+        }
+        return timeLong;
+    }
+
+    /**
+     * 将指定带单位的字符串数值转换为Int类型
+     * @param timeStr
+     * @return
+     */
+    public static Integer parseTimeInt(String timeStr){
+        //默认5分钟
+        Integer timeInt=0;
+        //不为空才进行赋值操作否则沿用默认数值
+        if(timeStr!=null&&!"".equals(timeStr)){
+            String timeStrLower=timeStr.toLowerCase();
+            //此map记录了不同单位与毫秒的进制关系 key为单位 value为进制
+            Map<String,Integer> map=new HashMap<>();
+            map.put("ms",1);
+            map.put("s",1000);
+
+            Set<Map.Entry<String,Integer>> set=map.entrySet();
+            for(Map.Entry<String,Integer> entry:set){
+                String key=entry.getKey();
+                Integer value=entry.getValue();
+                //正则表达式
+                String regex="^[0-9]*"+key+"$";
+                //判断此次循环的数值是否是所支持的单位
+                if(timeStrLower.matches(regex)){
+                    //如果是是直接去掉单位 转换为数值
+                    timeInt=Integer.valueOf(timeStrLower.replaceAll("[^0-9]",""));
+                    //转换为毫秒
+                    return timeInt*=value;
+                }
+            }
+        }
+        return timeInt;
+    }
 
 
     //-------------------------------------------------------------------------------------------------------------------
