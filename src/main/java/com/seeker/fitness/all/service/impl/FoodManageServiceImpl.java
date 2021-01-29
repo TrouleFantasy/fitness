@@ -4,7 +4,7 @@ import com.seeker.fitness.all.entity.Food;
 import com.seeker.fitness.all.entity.FoodType;
 import com.seeker.fitness.all.ex.AddFoodException;
 import com.seeker.fitness.all.ex.WithIOException;
-import com.seeker.fitness.all.mapper.FoodMapper;
+import com.seeker.fitness.all.mapper.fitnessmapper.FoodMapper;
 import com.seeker.fitness.all.service.FoodManageService;
 import com.seeker.fitness.all.util.ResponseResult;
 import com.seeker.fitness.all.util.excel.FoodExcelUtil;

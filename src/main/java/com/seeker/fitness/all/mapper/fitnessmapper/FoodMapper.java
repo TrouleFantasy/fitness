@@ -1,4 +1,4 @@
-package com.seeker.fitness.all.mapper;
+package com.seeker.fitness.all.mapper.fitnessmapper;
 
 import com.seeker.fitness.all.entity.Food;
 import com.seeker.fitness.all.entity.FoodType;

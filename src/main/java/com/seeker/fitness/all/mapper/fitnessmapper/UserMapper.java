@@ -1,4 +1,4 @@
-package com.seeker.fitness.all.mapper;
+package com.seeker.fitness.all.mapper.fitnessmapper;
 
 import com.seeker.fitness.all.entity.User;
 import com.seeker.fitness.all.mapper.provider.UserDynamicSqlProvider;
@@ -12,7 +12,7 @@ public interface UserMapper {
      * @param user
      * @return
      */
-    @Insert("INSERT INTO user_list(user_name,user_code,password,name,sex,age,fitness_day,region,birth_date,stature,weight,phone_number,email,motto,status,token,salt,user_info,valid,add_user,modify_user,add_date,modify_date) VALUES(#{userName},#{userCode},#{password},#{name},#{sex},#{age},#{fitnessDay},#{region},#{birthDate},#{stature},#{weight},#{phoneNumber},#{email},#{motto},#{status},#{token},#{salt},#{userInfo},#{valid},#{addUser},#{modifyUser},#{addDate},#{modifyDate})")
+    @Insert("INSERT INTO user_list(user_name,user_code,password,name,sex,age,fitness_day,region,birth_date,stature,weight,phone_number,email,motto,status,salt,user_info,valid,add_user,modify_user,add_date,modify_date) VALUES(#{userName},#{userCode},#{password},#{name},#{sex},#{age},#{fitnessDay},#{region},#{birthDate},#{stature},#{weight},#{phoneNumber},#{email},#{motto},#{status},#{salt},#{userInfo},#{valid},#{addUser},#{modifyUser},#{addDate},#{modifyDate})")
     Integer addUser(User user);
 
     /**
@@ -51,6 +51,14 @@ public interface UserMapper {
     @Select("SELECT * FROM user_list WHERE user_name=#{userName}")
     @ResultMap("userMap")
     User getUserByUserName(String userName);
+
+    /**
+     * 根据昵称查找指定用户数量
+     * @param userName
+     * @return
+     */
+    @Select("SELECT count(*) FROM user_list WHERE user_name=#{userName}")
+    Integer countUserByUserName(String userName);
 
 //    @Update("<script> UPDATE user_list <set>"+
 ////            "<if test=\"userName != null\">user_name=#{userName}</if>"+

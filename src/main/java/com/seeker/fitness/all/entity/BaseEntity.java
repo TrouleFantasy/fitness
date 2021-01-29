@@ -9,9 +9,9 @@ import java.util.Date;
  */
 public class BaseEntity {
     @JSONField(serialize=false)
-    protected Integer addUser;//添加人
+    protected String addUser;//添加人
     @JSONField(serialize = false)
-    protected Integer modifyUser;//最后修改人
+    protected String modifyUser;//最后修改人
     @JSONField(serialize = false)
     protected Date addDate;//添加时间
     @JSONField(serialize = false)
@@ -37,19 +37,19 @@ public class BaseEntity {
                 '}';
     }
 
-    public Integer getAddUser() {
+    public String getAddUser() {
         return addUser;
     }
 
-    public void setAddUser(Integer addUser) {
+    public void setAddUser(String addUser) {
         this.addUser = addUser;
     }
 
-    public Integer getModifyUser() {
+    public String getModifyUser() {
         return modifyUser;
     }
 
-    public void setModifyUser(Integer modifyUser) {
+    public void setModifyUser(String modifyUser) {
         this.modifyUser = modifyUser;
     }
 

@@ -31,4 +31,11 @@ public interface UserService {
      * @return
      */
     ResponseResult passwordModify(JSONObject updateObj);
+
+    /**
+     * 用户资料修改
+     * @param user
+     * @return
+     */
+    ResponseResult userDataModify(HttpServletRequest request,User user);
 }

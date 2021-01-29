@@ -2,6 +2,7 @@ package com.seeker.fitness.all.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.config.ConfigParamMapping;
+import com.seeker.fitness.all.ex.IllegalTokenException;
 import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -37,8 +38,11 @@ public class Token {
      * @param token
      * @return
      */
-    public static Token parseTokenObj(String token){
+    public static Token parseTokenObj(String token) throws IllegalTokenException{
         String[] tokenArr=token.split("\\.");
+        if(tokenArr.length!=3){
+            throw new IllegalTokenException("非法Token！");
+        }
         String tokenHeaderStr= PracticalUtil.base64Decoder(tokenArr[0]);
         String tokenPayloadStr=PracticalUtil.base64Decoder(tokenArr[1]);
         String userSignature=tokenArr[2];

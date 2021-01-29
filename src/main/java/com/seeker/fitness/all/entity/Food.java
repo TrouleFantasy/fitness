@@ -141,7 +141,7 @@ public class Food extends BaseEntity{
      * @param addDate
      * @param modifyDate
      */
-    public void appoint(String name, Double carbohydrate, Double protein, Double fat, Double fiber, Double sodium, Integer type, Integer addUser, Integer modifyUser, Date addDate, Date modifyDate){
+    public void appoint(String name, Double carbohydrate, Double protein, Double fat, Double fiber, Double sodium, Integer type, String addUser, String modifyUser, Date addDate, Date modifyDate){
         setName(name);
         setCarbohydrate(carbohydrate);
         setProtein(protein);

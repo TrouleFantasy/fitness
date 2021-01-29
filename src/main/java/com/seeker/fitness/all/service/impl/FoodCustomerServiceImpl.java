@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.entity.Food;
 import com.seeker.fitness.all.ex.InputAnomalyException;
 import com.seeker.fitness.all.ex.WithIOException;
-import com.seeker.fitness.all.mapper.FoodMapper;
+import com.seeker.fitness.all.mapper.fitnessmapper.FoodMapper;
 import com.seeker.fitness.all.service.FoodCustomerService;
 import com.seeker.fitness.all.util.excel.FoodExcelUtil;
 import org.slf4j.Logger;

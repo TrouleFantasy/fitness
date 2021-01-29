@@ -68,7 +68,7 @@ public class UserDynamicSqlProvider {
                 if(user.getModifyDate()!=null){
                     SET("modify_date=#{modifyDate}");
                 }
-                WHERE("id=#{id}");
+                WHERE("user_code=#{userCode}");
             }
         }.toString();
     }

@@ -5,7 +5,7 @@ import com.seeker.fitness.all.config.ConfigParamMapping;
 import com.seeker.fitness.all.entity.User;
 import com.seeker.fitness.all.ex.DataBasesException;
 import com.seeker.fitness.all.ex.ServiceException;
-import com.seeker.fitness.all.mapper.UserMapper;
+import com.seeker.fitness.all.mapper.fitnessmapper.UserMapper;
 import com.seeker.fitness.all.service.UserService;
 import com.seeker.fitness.all.util.PracticalUtil;
 import com.seeker.fitness.all.util.ResponseResult;
@@ -60,28 +60,28 @@ public class UserServiceImpl implements UserService {
         if(StringUtils.isEmpty(user.getPhoneNumber())){
             return ResponseResult.errorResponse("phoneNumber字段不能为空！");
         }
-        //开始数据操作
-        //制造盐值
-        String salt=PracticalUtil.createSecureSalt();
-        user.setSalt(salt);
-        //密码加密
-        String Md5Password=PracticalUtil.createSecurePassword(user.getPassword(),salt);
-        user.setPassword(Md5Password);
-        //计算年龄
-        Date birthDate=user.getBirthDate();
-        Integer age= PracticalUtil.getAgeByBirthDate(birthDate);
-        user.setAge(age);
-        //设置四项日志
-        user.setAddDate(new Date());
-        user.setAddUser(0);
-        user.setModifyDate(new Date());
-        user.setModifyUser(0);
-        //开始写入数据库
-        Integer resultInt=userMapper.addUser(user);
-        if(resultInt!=1){
-            throw new DataBasesException("注册失败！请联系管理员！");
+        try {
+            //开始数据操作
+            //制造盐值
+            String salt = PracticalUtil.createSecureSalt();
+            user.setSalt(salt);
+            //密码加密
+            String Md5Password = PracticalUtil.createSecurePassword(user.getPassword(), salt);
+            user.setPassword(Md5Password);
+            //计算年龄
+            Date birthDate = user.getBirthDate();
+            Integer age = PracticalUtil.getAgeByBirthDate(birthDate);
+            user.setAge(age);
+            //开始写入数据库
+            Integer resultInt = addUser(user);
+            if (resultInt != 1) {
+                throw new DataBasesException("注册失败！请联系管理员！");
+            }
+            return ResponseResult.successResponse();
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseResult.errorResponse("注册失败！请联系管理员！");
         }
-        return ResponseResult.successResponse();
     }
 
     /**
@@ -224,10 +224,9 @@ public class UserServiceImpl implements UserService {
 
             //开始数据操作
             User newPassUser=new User();
-            newPassUser.setId(resultUser.getId());
             String secureNewPassword=PracticalUtil.createSecurePassword(newPassword,resultSalt);
             newPassUser.setPassword(secureNewPassword);
-            Integer resultInt=userMapper.updateUser(newPassUser);
+            Integer resultInt=updateUser(newPassUser);
             if(resultInt!=1){
                 throw new DataBasesException("密码修改失败！请联系管理员！");
             }
@@ -240,5 +239,48 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
             return ResponseResult.errorResponse("密码修改失败！");
         }
+    }
+
+    /**
+     * 用户资料修改
+     * @param user
+     * @return
+     */
+    public ResponseResult userDataModify(HttpServletRequest request,User user) {
+        if(user==null||StringUtils.isEmpty(user.getUserCode())||StringUtils.isEmpty(user.getUserName())){
+            return ResponseResult.errorResponse("参数错误！修改失败！");
+        }
+        //获取用户携带的token
+        String token=request.getHeader("token");
+        Token tokenObj=Token.parseTokenObj(token);
+        if(!user.getUserCode().equals(tokenObj.getUserCode())){
+            return ResponseResult.errorResponse("修改非法!");
+        }
+        String newUserName=user.getUserName();
+        if(userMapper.countUserByUserName(newUserName)!=0){
+            throw new DataBasesException("昵称已存在！请联系管理员！");
+        }
+        Integer resultInt=updateUser(user);
+        if(resultInt!=1){
+            throw new DataBasesException("资料修改失败！请联系管理员！");
+        }
+        return ResponseResult.successResponse();
+    }
+
+    private Integer updateUser(User user){
+        System.out.println("User修改后的数据："+JSONObject.toJSONString(user));
+        user.setModifyDate(new Date());
+        user.setModifyUser(user.getUserCode());
+        return userMapper.updateUser(user);
+    }
+
+    private Integer addUser(User user){
+        //设置日志项以及有效标记
+        user.setAddDate(new Date());
+        user.setAddUser("0");
+        user.setModifyDate(new Date());
+        user.setModifyUser("0");
+        user.setValid(1);
+        return  userMapper.addUser(user);
     }
 }

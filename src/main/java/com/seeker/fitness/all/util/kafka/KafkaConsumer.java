@@ -2,9 +2,8 @@ package com.seeker.fitness.all.util.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class KafkaConsumer {
     /**
      * 订阅指定的主题消息

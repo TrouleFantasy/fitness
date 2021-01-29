@@ -2,7 +2,7 @@ package com.seeker.fitness.mapper;
 
 import com.seeker.fitness.all.entity.Food;
 import com.seeker.fitness.all.entity.FoodType;
-import com.seeker.fitness.all.mapper.FoodMapper;
+import com.seeker.fitness.all.mapper.fitnessmapper.FoodMapper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +29,7 @@ public class FoodMapperTest {
     }
 
     @Test
-    void getFoodBynameTest(){
+    public void getFoodBynameTest(){
         List<Food> list=foodMapper.getFoodsByName("鸡");
         for(Food food:list){
             System.out.println(food.toString());
@@ -39,7 +39,7 @@ public class FoodMapperTest {
     @Test
     void addFood(){
         Food food=new Food();
-        food.appoint("鸡胸肉0",0.025,0.194,0.05,null,null,1,0,0,new Date(),new Date());
+        food.appoint("鸡胸肉0",0.025,0.194,0.05,null,null,1,"0","0",new Date(),new Date());
         foodMapper.addFood(food);
     }
 

@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UserContrller {
     @Autowired
     private UserService userService;
+
     /**
      * 用户注册接口
      * @param user
@@ -47,5 +48,17 @@ public class UserContrller {
     public ResponseResult updatePassword(@RequestBody JSONObject updateObj){
         return userService.passwordModify(updateObj);
     }
+
+    /**
+     * 用户资料修改
+     * @param request
+     * @param user
+     * @return
+     */
+    @RequestMapping("updateUserData")
+    public ResponseResult updateUserData(HttpServletRequest request,@RequestBody User user){
+        return userService.userDataModify(request,user);
+    }
+
 
     }

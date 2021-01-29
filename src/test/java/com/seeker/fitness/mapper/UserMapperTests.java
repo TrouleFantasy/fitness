@@ -1,7 +1,7 @@
 package com.seeker.fitness.mapper;
 
 import com.seeker.fitness.all.entity.User;
-import com.seeker.fitness.all.mapper.UserMapper;
+import com.seeker.fitness.all.mapper.fitnessmapper.UserMapper;
 import com.seeker.fitness.all.util.PracticalUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +33,9 @@ public class UserMapperTests {
         user.setBirthDate(birDate);
         user.setAge(PracticalUtil.getAgeByBirthDate(birDate));
         user.setPhoneNumber("15233571928");
-        user.setAddUser(0);
+        user.setAddUser("0");
         user.setAddDate(new Date());
-        user.setModifyUser(0);
+        user.setModifyUser("0");
         user.setModifyDate(new Date());
         Integer state=userMapper.addUser(user);
         System.out.println("state:"+state);
@@ -59,7 +59,7 @@ public class UserMapperTests {
                 user1.setId(user.getId());
 //                user1.setUserName("测试改后");
                 user1.setMotto("测试测试");
-                user1.setModifyUser(user.getId());
+                user1.setModifyUser(user.getUserCode());
                 user1.setModifyDate(new Date());
                 Integer state=userMapper.updateUser(user1);
                 System.out.println("state:"+state);
