@@ -12,6 +12,8 @@ import com.seeker.fitness.all.util.ResponseResult;
 import com.seeker.fitness.all.util.Token;
 import com.seeker.fitness.all.util.redis.RedisFactory;
 import com.seeker.fitness.all.util.redis.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -25,6 +27,7 @@ import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private Logger log= LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private UserMapper userMapper;
     /**
@@ -33,6 +36,8 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public ResponseResult enrollUser(User user) {
+        String interfaceName="用户注册接口";
+        log.info(interfaceName+"入参："+JSONObject.toJSONString(user));
         //开始判空
         if(StringUtils.isEmpty(user.getUserCode())){
             return ResponseResult.errorResponse("userCoce字段不能为空！");
@@ -77,10 +82,14 @@ public class UserServiceImpl implements UserService {
             if (resultInt != 1) {
                 throw new DataBasesException("注册失败！请联系管理员！");
             }
-            return ResponseResult.successResponse();
+            ResponseResult responseResult=ResponseResult.successResponse();
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
         }catch (Exception e){
             e.printStackTrace();
-            return ResponseResult.errorResponse("注册失败！请联系管理员！");
+            ResponseResult responseResult=ResponseResult.errorResponse("注册失败！请联系管理员！");
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
         }
     }
 
@@ -90,6 +99,8 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public ResponseResult userLogin(JSONObject loginObj, HttpServletResponse response, HttpServletRequest request) {
+        String interfaceName="用户登录接口";
+        log.info(interfaceName+"入参："+JSONObject.toJSONString(loginObj));
         String userCode=loginObj.getString("userCode");
         String password=loginObj.getString("password");
         if(StringUtils.isEmpty(userCode)){
@@ -177,11 +188,16 @@ public class UserServiceImpl implements UserService {
             //设置一个hash表 表名为对应的userCode token为键 过期时间为值
             String tokenInfo=PracticalUtil.getTimeStamp(ConfigParamMapping.getTokenTimeOut())+ConfigParamMapping.getTokenSpaceMark()+userAgentInfo;
             jedis.hset(userCode,token,tokenInfo);
-            return ResponseResult.successResponse(resultUser.toResponseUser());
+
+            ResponseResult responseResult=ResponseResult.successResponse(resultUser.toResponseUser());
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
 
         }catch (Exception e){
             e.printStackTrace();
-            return ResponseResult.errorResponse("解析报文时出现异常！");
+            ResponseResult responseResult=ResponseResult.errorResponse("解析报文时出现异常！");
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
         }finally {
             //释放连接
             jedis.close();
@@ -190,11 +206,13 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 用户通过旧密码 修改密码
+     * 用户通过旧密码修改密码
      * @param updateObj
      * @return
      */
     public ResponseResult passwordModify(JSONObject updateObj) {
+        String interfaceName="用户通过旧密码修改密码";
+        log.info(interfaceName+"入参："+JSONObject.toJSONString(updateObj));
         try{
             String userCode=updateObj.getString("userCode");
             String oldPassword=updateObj.getString("oldPassword");
@@ -232,7 +250,10 @@ public class UserServiceImpl implements UserService {
             }
             //密码修改后 当前该用户所有的token都应当注销 删除该用户所有的token
             RedisUtil.cleanAllToken(userCode);
-            return ResponseResult.successResponse("密码修改成功！");
+
+            ResponseResult responseResult=ResponseResult.successResponse("密码修改成功！");
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
         }catch (ServiceException e){
             throw e;
         } catch (Exception e){
@@ -247,33 +268,55 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public ResponseResult userDataModify(HttpServletRequest request,User user) {
+        String interfaceName="用户资料修改";
+        log.info(interfaceName+"入参："+JSONObject.toJSONString(user));
         if(user==null||StringUtils.isEmpty(user.getUserCode())||StringUtils.isEmpty(user.getUserName())){
             return ResponseResult.errorResponse("参数错误！修改失败！");
         }
         //获取用户携带的token
         String token=request.getHeader("token");
+        log.info(interfaceName+"入参中的token："+token);
         Token tokenObj=Token.parseTokenObj(token);
+
+        ResponseResult responseResult;
         if(!user.getUserCode().equals(tokenObj.getUserCode())){
-            return ResponseResult.errorResponse("修改非法!");
+            responseResult=ResponseResult.errorResponse("修改非法!");
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
         }
         String newUserName=user.getUserName();
         if(userMapper.countUserByUserName(newUserName)!=0){
-            throw new DataBasesException("昵称已存在！请联系管理员！");
+            responseResult=ResponseResult.errorResponse(999,"昵称已存在！请重新输入!");
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
         }
         Integer resultInt=updateUser(user);
         if(resultInt!=1){
-            throw new DataBasesException("资料修改失败！请联系管理员！");
+            responseResult=ResponseResult.errorResponse(999,"资料修改失败！请联系管理员！");
+            log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+            return responseResult;
         }
-        return ResponseResult.successResponse();
-    }
 
+        responseResult=ResponseResult.successResponse();
+        log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+        return responseResult;
+    }
+    /**
+     * 封装mapper方法简化操作
+     * @param user
+     * @return
+     */
     private Integer updateUser(User user){
-        System.out.println("User修改后的数据："+JSONObject.toJSONString(user));
         user.setModifyDate(new Date());
         user.setModifyUser(user.getUserCode());
         return userMapper.updateUser(user);
     }
 
+    /**
+     * 封装mapper方法简化操作
+     * @param user
+     * @return
+     */
     private Integer addUser(User user){
         //设置日志项以及有效标记
         user.setAddDate(new Date());

@@ -14,13 +14,13 @@ public interface FoodManageService {
      * 新增一种食物
      * @param food
      */
-    void addFoodService(Food food);
+    ResponseResult addFoodService(Food food);
 
     /**
      * 根据上传excel批量新增食物
      * @param multipartFile
      */
-    ResponseResult addFoodsByExcelService(MultipartFile multipartFile);
+    ResponseResult addFoodsByExcelService(String userCode,MultipartFile multipartFile);
 
     /**
      * 下载上传模版

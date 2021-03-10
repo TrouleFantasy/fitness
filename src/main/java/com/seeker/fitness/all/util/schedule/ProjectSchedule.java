@@ -4,6 +4,8 @@ import com.seeker.fitness.all.config.ConfigParamMapping;
 import com.seeker.fitness.all.entity.QueryTable;
 import com.seeker.fitness.all.mapper.fitnessmapper.QueryTableMapper;
 import com.seeker.fitness.all.mapper.informationschemamapper.TableMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
@@ -13,6 +15,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class ProjectSchedule {
+    private static Logger log= LoggerFactory.getLogger(ProjectSchedule.class);
     @Autowired
     private TableMapper tableMapper;
     @Autowired
@@ -26,7 +29,7 @@ public class ProjectSchedule {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println(">>>-----------------更新允许表计划任务开始("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
+                log.info(">>>-----------------更新允许表计划任务开始("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
                 //获取Fitness库所有表名
                 List<String> tableNames=tableMapper.getTableNameByDatabaseName("Fitness");
                 List<String> allowTableNames=queryTableMapper.queryAllTableName();
@@ -34,7 +37,7 @@ public class ProjectSchedule {
                 tableNames.removeAll(allowTableNames);
                 //将剩下新增的表插入记录表中
                 tableNames.forEach(tableName ->{queryTableMapper.addAllowTable(new QueryTable(tableName));});
-                System.out.println(">>>-----------------更新允许表计划任务结束("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
+                log.info(">>>-----------------更新允许表计划任务结束("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
             }
         },0);
     }

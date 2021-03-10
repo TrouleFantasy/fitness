@@ -35,7 +35,7 @@ user:
   tokenTimeOut: 600s #token超时时间｜s秒 ms毫秒
   tokenSpaceMark: -- #token信息间隔符
   scheduleStartCleanTokenTime: 0s #项目启动后开始清理token时间｜s秒 ms毫秒
-  scheduleCleanTokenTime: 120s #清理token间隔时间｜s秒 ms毫秒
+  scheduleCleanTokenTime: 600s #清理token间隔时间｜s秒 ms毫秒
   secret: Zjh990713_fitnessProject #token密钥
 
 redis:

@@ -2,6 +2,7 @@ package com.seeker.fitness.all.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.entity.Food;
+import com.seeker.fitness.all.util.ResponseResult;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -28,5 +29,5 @@ public interface FoodCustomerService {
      * 下载食谱Excel文件(按餐写出)
      * @param response
      */
-    void downLoadExcelService(Map requestbody, HttpServletResponse response);
+    ResponseResult downLoadExcelService(Map requestbody, HttpServletResponse response);
 }

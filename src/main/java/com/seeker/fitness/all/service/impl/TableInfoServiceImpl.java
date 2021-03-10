@@ -6,6 +6,8 @@ import com.seeker.fitness.all.mapper.fitnessmapper.QueryTableMapper;
 import com.seeker.fitness.all.mapper.informationschemamapper.TableMapper;
 import com.seeker.fitness.all.service.TableInfoService;
 import com.seeker.fitness.all.util.ResponseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.Map;
 
 @Service
 public class TableInfoServiceImpl implements TableInfoService {
+    private static Logger log= LoggerFactory.getLogger(TableInfoServiceImpl.class);
     @Autowired
     private TableMapper tableMapper;
 
@@ -24,16 +27,17 @@ public class TableInfoServiceImpl implements TableInfoService {
     private QueryTableMapper queryTableMapper;
 
     /**
-     * 获取表详情
-     *
+     * 开发人员专用接口-获取表详情
      * @return
      */
     public ResponseResult getTableInfo(HttpServletRequest request, JSONObject requestbody, String tableName, List<String> exclude) {
+        String interfaceName="开发人员专用接口-获取表详情Service层";
+        log.info(interfaceName+"入参："+ JSONObject.toJSONString(requestbody));
         try {
             //获取允许查询的表名
             List<String> resultAllowList=queryTableMapper.queryAllowTableName();
             if(!resultAllowList.contains(tableName)){
-                return ResponseResult.errorResponse("未经允许的表！");
+                return ResponseResult.errorResponse("未经允许的表！",interfaceName,log);
             }
 
             //创建返回对象
@@ -64,20 +68,21 @@ public class TableInfoServiceImpl implements TableInfoService {
                 }
                 responeArr.add(columnInfo);
             }
-            return ResponseResult.successResponse(returnObj);
+            return ResponseResult.successResponse(returnObj,interfaceName,log);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseResult.errorResponse("系统错误，请联系管理员！");
+            return ResponseResult.errorResponse("系统错误，请联系管理员！",interfaceName,log);
         }
     }
 
     /**
-     * 获取允许查看的表名
+     * 开发人员专用接口-获取允许查看的表名
      * @return
      */
     public ResponseResult queryTableList() {
+        String interfaceName="开发人员专用接口-获取允许查看的表名";
         //查询Fitness库下所有允许查看的表名
         List<String> list=queryTableMapper.queryAllowTableName();
-        return ResponseResult.successResponse(list);
+        return ResponseResult.successResponse(list,interfaceName,log);
     }
 }

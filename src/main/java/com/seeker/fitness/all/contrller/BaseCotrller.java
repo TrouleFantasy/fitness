@@ -1,10 +1,13 @@
 package com.seeker.fitness.all.contrller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.ex.AddFoodException;
 import com.seeker.fitness.all.ex.DataBasesException;
 import com.seeker.fitness.all.ex.InputAnomalyException;
 import com.seeker.fitness.all.ex.ServiceException;
 import com.seeker.fitness.all.util.ResponseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -19,7 +22,7 @@ import java.io.IOException;
  */
 @RestControllerAdvice
 public class BaseCotrller {
-
+    private Logger log= LoggerFactory.getLogger(BaseCotrller.class);
     @ExceptionHandler({ServiceException.class})
     public ResponseResult<Void> serviceHandle(Throwable ex){
         ResponseResult<Void> responseResult=new ResponseResult<>(ex);
@@ -37,6 +40,7 @@ public class BaseCotrller {
             //999 数据相关错误
             responseResult.setStatus(999);
         }
+        log.info("统一返回异常类反参："+ JSONObject.toJSONString(responseResult));
         return responseResult;
     }
 //    @ExceptionHandler({SQLException.class})

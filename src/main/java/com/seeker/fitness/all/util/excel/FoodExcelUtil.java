@@ -22,7 +22,6 @@ public class FoodExcelUtil {
     private static String sheetName;
     //写在静态初始化块中，使得其被加载时都会读取配置文件
     static {
-        System.out.println("调用了初始化块");
         //读取配置文件获取模版信息
         Map<String,Object> yamlMap=ReadConfigFileUtil.getYaml("ExcelHeadModel.yml");
         sheetName=String.valueOf(yamlMap.get("foodImportTemplate_sheet"));

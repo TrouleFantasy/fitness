@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("foods")
@@ -27,14 +27,17 @@ public class FoodContrller {
     @Autowired
     FoodCustomerService foodCustomerService;
     /**
-     * 添加一种新食物
+     * 新增一种食物
      * @param food
      * @return
      */
     @RequestMapping("addFood")
     public ResponseResult<Void> addFood(@RequestBody Food food){
-        foodManageService.addFoodService(food);
-        return ResponseResult.successResponse();
+        String interfaceName="新增一种食物";
+        log.info("<<--------------"+interfaceName+"调用开始-------------->>");
+        ResponseResult responseResult = foodManageService.addFoodService(food);
+        log.info("<<--------------"+interfaceName+"调用结束-------------->>");
+        return responseResult;
     }
 
     /**
@@ -43,8 +46,12 @@ public class FoodContrller {
      * @return
      */
     @RequestMapping("uploadFoodByExcel")
-    public ResponseResult<Void> addFoodsByExcel(@RequestParam("file")MultipartFile multipartFile){
-        return foodManageService.addFoodsByExcelService(multipartFile);
+    public ResponseResult<Void> addFoodsByExcel(@RequestParam("file")MultipartFile multipartFile,@RequestParam("userCode")String userCode){
+        String interfaceName="根据上传excel批量新增食物";
+        log.info("<<--------------"+interfaceName+"调用开始-------------->>");
+        ResponseResult responseResult = foodManageService.addFoodsByExcelService(userCode,multipartFile);
+        log.info("<<--------------"+interfaceName+"调用结束-------------->>");
+        return responseResult;
     }
 
     /**
@@ -54,7 +61,11 @@ public class FoodContrller {
      */
     @RequestMapping("queryFoodsByType")
     public ResponseResult<List> queryFoodsByType(@RequestBody JSONObject requestbody){
-        return ResponseResult.successResponse(foodCustomerService.queryFoodsServiceByType(requestbody));
+        String interfaceName="根据种类获取对应食物信息";
+        log.info("<<--------------"+interfaceName+"调用开始-------------->>");
+        ResponseResult responseResult = ResponseResult.successResponse(foodCustomerService.queryFoodsServiceByType(requestbody));
+        log.info("<<--------------"+interfaceName+"调用结束-------------->>");
+        return responseResult;
     }
 
     /**
@@ -64,7 +75,11 @@ public class FoodContrller {
      */
     @RequestMapping("queryFoodsByName")
     public ResponseResult<List> queryFoodsByName(@RequestBody JSONObject requestbody){
-        return ResponseResult.successResponse(foodCustomerService.queryFoodsServiceByName(requestbody));
+        String interfaceName="根据食物名称获取对应食物信息";
+        log.info("<<--------------"+interfaceName+"调用开始-------------->>");
+        ResponseResult responseResult = ResponseResult.successResponse(foodCustomerService.queryFoodsServiceByName(requestbody));
+        log.info("<<--------------"+interfaceName+"调用结束-------------->>");
+        return responseResult;
     }
 
     /**
@@ -72,8 +87,12 @@ public class FoodContrller {
      * @param response
      */
     @RequestMapping("downLoadExcel")
-    public void downLoadExcel(@RequestBody Map<String,List<Food>> requestbody, HttpServletResponse response){
-        foodCustomerService.downLoadExcelService(requestbody,response);
+    public ResponseResult downLoadExcel(@RequestBody LinkedHashMap<String,List<Food>> requestbody, HttpServletResponse response){
+        String interfaceName="下载食谱Excel文件(按餐写出)";
+        log.info("<<--------------"+interfaceName+"调用开始-------------->>");
+        ResponseResult responseResult = foodCustomerService.downLoadExcelService(requestbody,response);
+        log.info("<<--------------"+interfaceName+"调用结束-------------->>");
+        return responseResult;
     }
 
     /**
@@ -83,6 +102,9 @@ public class FoodContrller {
      */
     @RequestMapping("downLoadMode")
     public void downLoadMode(HttpServletResponse response){
+        String interfaceName="下载上传模版";
+        log.info("<<--------------"+interfaceName+"调用开始-------------->>");
         foodManageService.downLoadModeService(response);
+        log.info("<<--------------"+interfaceName+"调用结束-------------->>");
     }
 }

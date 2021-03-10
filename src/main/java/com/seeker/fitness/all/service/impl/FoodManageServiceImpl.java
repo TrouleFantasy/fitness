@@ -1,5 +1,6 @@
 package com.seeker.fitness.all.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.seeker.fitness.all.entity.Food;
 import com.seeker.fitness.all.entity.FoodType;
 import com.seeker.fitness.all.ex.AddFoodException;
@@ -22,9 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 本类实现了关于食物后台管理业务层接口(FoodManageService)的所有方法
@@ -40,7 +39,9 @@ public class FoodManageServiceImpl implements FoodManageService {
      *
      * @param food
      */
-    public void addFoodService(Food food) {
+    public ResponseResult addFoodService(Food food) {
+        String interfaceName="新增一种食物";
+        log.info(interfaceName+"入参："+JSONObject.toJSONString(food));
         Food foodObj = new Food();
         foodObj.appoint(food.getName(), food.getCarbohydrate(), food.getProtein(), food.getFat(), food.getFiber(), food.getSodium(), food.getType());
         try {
@@ -49,7 +50,9 @@ public class FoodManageServiceImpl implements FoodManageService {
             e.printStackTrace();
             throw new AddFoodException("新增食物失败！sql执行不成功！");
         }
-
+        ResponseResult responseResult=ResponseResult.successResponse();
+        log.info(interfaceName+"反参："+JSONObject.toJSONString(responseResult));
+        return responseResult;
     }
 
     /**
@@ -57,9 +60,11 @@ public class FoodManageServiceImpl implements FoodManageService {
      * @param multipartFile
      * @return
      */
-    public ResponseResult addFoodsByExcelService(MultipartFile multipartFile) {
+    public ResponseResult addFoodsByExcelService(String userCode,MultipartFile multipartFile) {
+        String interfaceName="根据上传excel批量新增食物";
         try {
             String fileName = multipartFile.getOriginalFilename();
+            log.info(interfaceName+"入参文件名："+fileName);
             if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
                 String error = "上传文件格式不正确";
                 return ResponseResult.errorResponse(error);
@@ -73,6 +78,8 @@ public class FoodManageServiceImpl implements FoodManageService {
             }
             StringBuffer sb=new StringBuffer();
             List<Food> list= FoodExcelUtil.readerToList(workbook);
+            log.info(interfaceName+"入参转换后："+JSONObject.toJSONString(list));
+            List<Food> successList=new ArrayList<>();
             //开始循环写入
             for(int i=0;i<list.size();i++){
                 Food food=list.get(i);
@@ -92,13 +99,19 @@ public class FoodManageServiceImpl implements FoodManageService {
                     food.setType(foodType.getType());
                 }
                 food.attributeToOne();//此方法将食物成分全部设置为每1克
+                food.setAddUser(userCode);
+                food.setModifyUser(userCode);
+                food.setAddDate(new Date());
+                food.setModifyDate(new Date());
                 try {
                     foodMapper.addFood(food);//开始写入
+                    successList.add(food);
                 } catch (Exception e) {
                     sb.append("第"+(i+2)+"行食物<"+foodName+">添加失败，sql执行不成功!|");
                     e.printStackTrace();
                 }
             }
+            log.info(interfaceName+"最终录入项："+JSONObject.toJSONString(successList));
             //判断sb字符串，假如该字符串长度不为零 说明有未录项
             if(sb.length()!=0){
                 sb.deleteCharAt(sb.lastIndexOf("|"));
@@ -120,8 +133,7 @@ public class FoodManageServiceImpl implements FoodManageService {
      * @param response
      */
     public void downLoadModeService(HttpServletResponse response) {
-        String interfaceName="下载上传模版";
-        System.out.println(interfaceName+"接口开始调用");
+//        String interfaceName="下载上传模版";
         try {
             response.setContentType("application/force-download");
             response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("食物导入模版.xlsx", "UTF-8"));
@@ -133,7 +145,6 @@ public class FoodManageServiceImpl implements FoodManageService {
             Map<String,String[]> map=new HashMap<>();
             map.put("foodTypes",foodTypes);
             FoodExcelUtil.writeMode(map,response.getOutputStream());
-            System.out.println(interfaceName+"调用结束");
         } catch (IOException e) {
             e.printStackTrace();
             throw new WithIOException("获取IO流异常！下载模版失败！");
