@@ -3,12 +3,15 @@ package com.seeker.fitness.all.util.redis;
 import com.seeker.fitness.all.config.ConfigParamMapping;
 import com.seeker.fitness.all.util.PracticalUtil;
 import com.seeker.fitness.all.util.Token;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
 
 public class RedisUtil{
+    private static Logger log= LoggerFactory.getLogger(RedisUtil.class);
     private static Long tokenTimeOut= ConfigParamMapping.getTokenTimeOut();
     /**
      * 判断给定token是否有效
@@ -216,7 +219,7 @@ public class RedisUtil{
                 if(Long.valueOf(value.split(ConfigParamMapping.getTokenSpaceMark())[0])<new Date().getTime()){
                     //如果已到期则删除对应token
                     deleteToken(userCode,token,jedis);
-                    System.out.println("超时|被删除token信息:<<"+userCode+":"+token+":"+value+">>");
+                    log.debug("超时|被删除token信息:<<"+userCode+":"+token+":"+value+">>");
                 }
             }
 
@@ -228,7 +231,7 @@ public class RedisUtil{
                 String token=entry.getKey();
                 String value=entry.getValue();
                 deleteToken(userCode,token,jedis);
-                System.out.println("超量|被删除token信息:<<"+userCode+":"+token+":"+value+">>");
+                log.debug("超量|被删除token信息:<<"+userCode+":"+token+":"+value+">>");
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -261,7 +264,7 @@ public class RedisUtil{
             //如果该表长度小于等于0 说明该用户已经没有在登录状态的设备了 届时删除用户登陆集合表中对于该用户的记录
             if(hlen<=0){
                 jedis.srem(ConfigParamMapping.getRedisLoginTableName(),userCode);
-                System.out.println("用户"+userCode+"已无有效token，已清空"+ConfigParamMapping.getRedisLoginTableName()+"中对应记录");
+                log.debug("用户"+userCode+"已无有效token，已清空"+ConfigParamMapping.getRedisLoginTableName()+"中对应记录");
             }
         }catch (Exception e){
             e.printStackTrace();

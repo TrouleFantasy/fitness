@@ -29,7 +29,7 @@ public class ProjectSchedule {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                log.info(">>>-----------------更新允许表计划任务开始("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
+                log.debug(">>>-----------------更新允许表计划任务开始("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
                 //获取Fitness库所有表名
                 List<String> tableNames=tableMapper.getTableNameByDatabaseName("Fitness");
                 List<String> allowTableNames=queryTableMapper.queryAllTableName();
@@ -37,7 +37,7 @@ public class ProjectSchedule {
                 tableNames.removeAll(allowTableNames);
                 //将剩下新增的表插入记录表中
                 tableNames.forEach(tableName ->{queryTableMapper.addAllowTable(new QueryTable(tableName));});
-                log.info(">>>-----------------更新允许表计划任务结束("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
+                log.debug(">>>-----------------更新允许表计划任务结束("+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+")-----------------<<<");
             }
         },0);
     }
