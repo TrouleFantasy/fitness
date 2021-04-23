@@ -84,4 +84,18 @@ public class ProjectConfig extends WebMvcConfigurationSupport {
 //            System.out.println(messageConverter);
 //        }
 //    }
+
+//    /**
+//     * 注册拦截器方法之一
+//     * @return
+//     */
+//    @Bean
+//    public FilterRegistrationBean reistFilter(){
+//        FilterRegistrationBean registationBean=new FilterRegistrationBean();
+//        registationBean.setFilter(new TestFilter());
+//        registationBean.addUrlPatterns("/*");
+//        registationBean.setName("testFilter2");
+//        registationBean.setOrder(1);
+//        return registationBean;
+//    }
 }

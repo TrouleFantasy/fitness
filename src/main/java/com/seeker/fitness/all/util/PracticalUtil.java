@@ -14,7 +14,31 @@ import java.util.regex.Pattern;
  * 按照规律生成打印日志的标示，辅助查找日志
  */
 public class PracticalUtil {
+    /**
+     * 将输入流转换为byte数组
+     * @param is
+     * @return
+     * @throws IOException
+     */
+    public static byte[] toByteArray(InputStream is) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
 
+        try {
+            byte[] b = new byte[4096];
+            boolean var3 = false;
+
+            int n;
+            while((n = is.read(b)) != -1) {
+                output.write(b, 0, n);
+            }
+
+            byte[] var4 = output.toByteArray();
+            return var4;
+        } finally {
+            output.close();
+        }
+    }
+//-------------------------------------------------------------------------------------------------------------------
     /**
      * 根据时间生成时间标志
      *
@@ -228,8 +252,8 @@ public class PracticalUtil {
 
     /**
      * 将字符串数组转换为字符串
-     * @param strArr
-     * @param spaceMark
+     * @param strArr 字符串数组
+     * @param spaceMark 间隔符
      * @return
      */
     public static String arrayToString(String[] strArr,String spaceMark){
